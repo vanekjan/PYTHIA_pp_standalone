@@ -1,0 +1,10 @@
+
+Universe     = vanilla
+Executable   = /gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/D_star_MB/run_in_submit_main.sh
+getenv = true
+
+Output       = /gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/D_star_MB/log/pp_510/output_D_star_pp_510_MB_10M_events_$(Process).out
+Error        = /gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/D_star_MB/log/pp_510/output_D_star_pp_510_MB_10M_events_$(Process).err
+Arguments    = 10000000 510 ./output/pp_510/output_D_star_pp_510_MB_10M_events_$(Process).root $(Process)
+
+Queue 100
