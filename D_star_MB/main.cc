@@ -146,15 +146,31 @@ int main(int argc, char *argv[])
   TH2D *kaon_eta_vs_pion_eta_Dstar[nPtBins];
   TH2D *pion_eta_Dstar_vs_pion_eta_D0[nPtBins];
   
+  TH1D *nCorr_K_pi_D0[nPtBins];
+  TH1D *nCorr_K_pi_Dstar[nPtBins];
+  TH1D *nCorr_pi_Dstar_pi_D0[nPtBins];
+
+  TH1D *nCorr_clust_K_pi_D0[nPtBins];
+  TH1D *nCorr_clust_K_pi_Dstar[nPtBins];
+  TH1D *nCorr_clust_pi_Dstar_pi_D0[nPtBins];
+  
   for(unsigned int pTbin = 0; pTbin < nPtBins; pTbin++)
   {
     kaon_phi_vs_pion_phi_D0[pTbin] = new TH2D(Form("kaon_phi_vs_pion_phi_D0_pT_%i", pTbin), Form("kaon_phi_vs_pion_phi_D0_pT_%i", pTbin), 120, -Pi(), Pi(), 120, -Pi(), Pi()); //phi of K and pi from decay of D0
     kaon_phi_vs_pion_phi_Dstar[pTbin] = new TH2D(Form("kaon_phi_vs_pion_phi_Dstar_pT_%i", pTbin), Form("kaon_phi_vs_pion_phi_Dstar_pT_%i", pTbin), 120, -Pi(), Pi(), 120, -Pi(), Pi()); //phi of K from decay of D0, and pi from decay of D*
     pion_phi_Dstar_vs_pion_phi_D0[pTbin] = new TH2D(Form("pion_phi_Dstar_vs_pion_phi_D0_pT_%i", pTbin), Form("pion_phi_Dstar_vs_pion_phi_D0_pT_%i", pTbin), 120, -Pi(), Pi(), 120, -Pi(), Pi()); //phi of decay of pi from decay of D0 and pi from decay of D*
     
-    kaon_eta_vs_pion_eta_D0[pTbin] = new TH2D(Form("kaon_eta_vs_pion_eta_D0_pT_%i", pTbin), Form("kaon_eta_vs_pion_eta_D0_pT_%i", pTbin), 60, -1, 1, 60, -1, 1); //phi of K and pi from decay of D0
-    kaon_eta_vs_pion_eta_Dstar[pTbin] = new TH2D(Form("kaon_eta_vs_pion_eta_Dstar_pT_%i", pTbin), Form("kaon_eta_vs_pion_eta_Dstar_pT_%i", pTbin), 60, -1, 1, 60, -1, 1); //phi of K from decay of D0, and pi from decay of D*
-    pion_eta_Dstar_vs_pion_eta_D0[pTbin] = new TH2D(Form("pion_eta_Dstar_vs_pion_eta_D0_pT_%i", pTbin), Form("pion_eta_Dstar_vs_pion_eta_D0_pT_%i", pTbin), 60, -1, 1, 60, -1, 1); //phi of decay of pi from decay of D0 and pi from decay of D*  
+    kaon_eta_vs_pion_eta_D0[pTbin] = new TH2D(Form("kaon_eta_vs_pion_eta_D0_pT_%i", pTbin), Form("kaon_eta_vs_pion_eta_D0_pT_%i", pTbin), 40, -1, 1, 40, -1, 1); //phi of K and pi from decay of D0
+    kaon_eta_vs_pion_eta_Dstar[pTbin] = new TH2D(Form("kaon_eta_vs_pion_eta_Dstar_pT_%i", pTbin), Form("kaon_eta_vs_pion_eta_Dstar_pT_%i", pTbin), 40, -1, 1, 40, -1, 1); //phi of K from decay of D0, and pi from decay of D*
+    pion_eta_Dstar_vs_pion_eta_D0[pTbin] = new TH2D(Form("pion_eta_Dstar_vs_pion_eta_D0_pT_%i", pTbin), Form("pion_eta_Dstar_vs_pion_eta_D0_pT_%i", pTbin), 40, -1, 1, 40, -1, 1); //phi of decay of pi from decay of D0 and pi from decay of D*  
+    
+    nCorr_K_pi_D0[pTbin] = new TH1D(Form("nCorr_K_pi_D0_pT_%i", pTbin), Form("nCorr_K_pi_D0_pT_%i", pTbin), 2, 0, 2);
+    nCorr_K_pi_Dstar[pTbin] = new TH1D(Form("nCorr_K_pi_Dstar_pT_%i", pTbin), Form("nCorr_K_pi_Dstar_pT_%i", pTbin), 2, 0, 2);
+    nCorr_pi_Dstar_pi_D0[pTbin] = new TH1D(Form("nCorr_pi_Dstar_pi_D0_pT_%i", pTbin), Form("nCorr_pi_Dstar_pi_D0_pT_%i", pTbin), 2, 0, 2);
+
+    nCorr_clust_K_pi_D0[pTbin] = new TH1D(Form("nCorr_clust_K_pi_D0_pT_%i", pTbin), Form("nCorr_clust_K_pi_D0_pT_%i", pTbin), 2, 0, 2);
+    nCorr_clust_K_pi_Dstar[pTbin] = new TH1D(Form("nCorr_clust_K_pi_Dstar_pT_%i", pTbin), Form("nCorr_clust_K_pi_Dstar_pT_%i", pTbin), 2, 0, 2);
+    nCorr_clust_pi_Dstar_pi_D0[pTbin] = new TH1D(Form("nCorr_clust_pi_Dstar_pi_D0_pT_%i", pTbin), Form("nCorr_clust_pi_Dstar_pi_D0_pT_%i", pTbin), 2, 0, 2);
   
   }
 
@@ -167,7 +183,7 @@ int main(int argc, char *argv[])
     
     for(unsigned int iPart = 0; iPart < pythia.event.size(); iPart++)
     {
-      if(fabs( pythia.event[iPart].id() != 413 )) continue; //continue only for D*+/-
+      if( fabs( pythia.event[iPart].id() ) != 413  ) continue; //continue only for D*+/-
       
       if( fabs(pythia.event[iPart].eta()) > 1 ) continue;
       
@@ -194,7 +210,7 @@ int main(int argc, char *argv[])
       int firstDaughter = pythia.event[iPart].daughter1(); //ID of D0 from decay of D*
       int secondDaughter = pythia.event[iPart].daughter2(); // ID of pi from decay of D*
       
-      if( fabs(pythia.event[firstDaughter].id()) == 421 && fabs( pythia.event[secondDaughter].id() ) == 211 )
+      if( fabs( pythia.event[firstDaughter].id() ) == 421 && fabs( pythia.event[secondDaughter].id() ) == 211 )
       {
         //cout<<"First daughter is D0"<<endl;
         
@@ -218,6 +234,76 @@ int main(int argc, char *argv[])
           kaon_eta_vs_pion_eta_D0[pT_bin]->Fill(pythia.event[firstDaughter_D0].eta(), pythia.event[secondDaughter_D0].eta());
           kaon_eta_vs_pion_eta_Dstar[pT_bin]->Fill(pythia.event[firstDaughter_D0].eta(), pythia.event[secondDaughter].eta());
           pion_eta_Dstar_vs_pion_eta_D0[pT_bin]->Fill(pythia.event[secondDaughter].eta(), pythia.event[secondDaughter_D0].eta());
+          
+          int bin_phi_pi_D0 = kaon_phi_vs_pion_phi_D0[pT_bin]->GetXaxis()->FindBin(pythia.event[secondDaughter_D0].phi());
+          int bin_phi_K_D0 = kaon_phi_vs_pion_phi_D0[pT_bin]->GetXaxis()->FindBin(pythia.event[firstDaughter_D0].phi());
+          int bin_phi_pi_D_star = kaon_phi_vs_pion_phi_Dstar[pT_bin]->GetXaxis()->FindBin(pythia.event[secondDaughter].phi());
+          
+          int bin_eta_pi_D0 = kaon_eta_vs_pion_eta_D0[pT_bin]->GetXaxis()->FindBin(pythia.event[secondDaughter_D0].eta());
+          int bin_eta_K_D0 = kaon_eta_vs_pion_eta_D0[pT_bin]->GetXaxis()->FindBin(pythia.event[firstDaughter_D0].eta());
+          int bin_eta_pi_D_star = kaon_eta_vs_pion_eta_Dstar[pT_bin]->GetXaxis()->FindBin(pythia.event[secondDaughter].eta());
+
+          // K and pi from decay of D0 in the same BEMC tower
+          if( (bin_phi_K_D0 == bin_phi_pi_D0) && ( bin_eta_K_D0 == bin_eta_pi_D0 ) )
+          {
+            nCorr_K_pi_D0[pT_bin]->Fill(1.5);          
+          }
+          else
+          {
+            nCorr_K_pi_D0[pT_bin]->Fill(0.5);          
+          }
+          
+          // K from decay of D0, pi from decay of D* in the same BEMC tower
+          if( (bin_phi_K_D0 == bin_phi_pi_D_star) && ( bin_eta_K_D0 == bin_eta_pi_D_star ) )
+          {
+            nCorr_K_pi_Dstar[pT_bin]->Fill(1.5);          
+          }
+          else
+          {
+            nCorr_K_pi_Dstar[pT_bin]->Fill(0.5);          
+          }
+          
+          // pi from decay of D0, pi from decay of D* in the same BEMC tower
+          if( (bin_phi_pi_D0 == bin_phi_pi_D_star) && ( bin_eta_pi_D0 == bin_eta_pi_D_star ) )
+          {
+            nCorr_pi_Dstar_pi_D0[pT_bin]->Fill(1.5);          
+          }
+          else
+          {
+            nCorr_pi_Dstar_pi_D0[pT_bin]->Fill(0.5);          
+          }
+          //__________________________________________________
+          
+          // K and pi from decay of D0 in the same BEMC cluster
+          if( fabs(bin_phi_K_D0 - bin_phi_pi_D0) < 2 && fabs( bin_eta_K_D0 - bin_eta_pi_D0 ) < 2 )
+          {
+            nCorr_clust_K_pi_D0[pT_bin]->Fill(1.5);          
+          }
+          else
+          {
+            nCorr_clust_K_pi_D0[pT_bin]->Fill(0.5);          
+          }
+          
+          // K from decay of D0, pi from decay of D* in the same BEMC cluster
+          if( fabs(bin_phi_K_D0 - bin_phi_pi_D_star) < 2 && fabs( bin_eta_K_D0 - bin_eta_pi_D_star ) < 2 )
+          {
+            nCorr_clust_K_pi_Dstar[pT_bin]->Fill(1.5);          
+          }
+          else
+          {
+            nCorr_clust_K_pi_Dstar[pT_bin]->Fill(0.5);          
+          }
+          
+          // pi from decay of D0, pi from decay of D* in the same BEMC cluster
+          if( fabs(bin_phi_pi_D0 - bin_phi_pi_D_star) < 2 && fabs( bin_eta_pi_D0 - bin_eta_pi_D_star ) < 2 )
+          {
+            nCorr_clust_pi_Dstar_pi_D0[pT_bin]->Fill(1.5);          
+          }
+          else
+          {
+            nCorr_clust_pi_Dstar_pi_D0[pT_bin]->Fill(0.5);          
+          }
+          
           
           break; //stop going through event when good D* decay is found
         
