@@ -80,6 +80,10 @@ int main(int argc, char *argv[])
   pythia.readString("310:OnIfMatch=211 -211");
   pythia.readString("-310:onMode=0");
   pythia.readString("-310:OnIfMatch=-211 211");
+  
+  pythia.readString("Random:setSeed = on");
+  pythia.readString("Random:seed = 0"); //should set random seed at start, after calling init()
+  
   pythia.init();
 
   // Create file on which histogram(s) can be saved.
@@ -95,7 +99,7 @@ int main(int argc, char *argv[])
   float const pT_bins_corr[nPtBins_corr+1] = { 0.5, 1.5, 5.};
 
   const int nEtaBins = 3;
-  float const eta_bins[nEtaBins+1] = { -1, -0.4, 0.4, 1 };
+  float const eta_bins[nEtaBins+1] = { -1, -0.2, 0.2, 1 };
 
   const int K0sPDGid = 310;
   const int K0sbarPDGid = -310;
@@ -126,6 +130,7 @@ int main(int argc, char *argv[])
   TH1D *K0s_K0s_cosThetaProdPlane = new TH1D("K0s_K0s_cosThetaProdPlane", "K0s_K0s_cosThetaProdPlane", 10, -1, 1);
   
   TH1D *K0s_K0s_cosThetaProdPlane_pT_hist[nPtBins_corr][nPtBins_corr];
+  TH1D *K0s_K0s_cosThetaProdPlane_pT_hist_tight_eta[nPtBins_corr][nPtBins_corr];
 
   TH1D *K0s_K0s_cosThetaProdPlane_eta_hist[nEtaBins][nEtaBins];
   
@@ -140,6 +145,7 @@ int main(int argc, char *argv[])
   TH1D *K0s_K0s_cosThetaProdPlane_cuts = new TH1D("K0s_K0s_cosThetaProdPlane_cuts", "K0s_K0s_cosThetaProdPlane_cuts", 10, -1, 1);
   
   TH1D *K0s_K0s_cosThetaProdPlane_pT_cuts_hist[nPtBins_corr][nPtBins_corr];
+  TH1D *K0s_K0s_cosThetaProdPlane_pT_cuts_hist_tight_eta[nPtBins_corr][nPtBins_corr];
 
   TH1D *K0s_K0s_cosThetaProdPlane_eta_cuts_hist[nEtaBins][nEtaBins];
 
@@ -177,7 +183,10 @@ int main(int argc, char *argv[])
     {
       
       K0s_K0s_cosThetaProdPlane_pT_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
+      K0s_K0s_cosThetaProdPlane_pT_hist_tight_eta[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_tight_eta_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_tight_eta_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
+      
       K0s_K0s_cosThetaProdPlane_pT_cuts_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
+      K0s_K0s_cosThetaProdPlane_pT_cuts_hist_tight_eta[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_cuts_tight_eta_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_cuts_tight_eta_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
 
     }
   }
@@ -198,6 +207,9 @@ int main(int argc, char *argv[])
   for (int iEvent = 0; iEvent < nEvents; ++iEvent)
   {
     if (!pythia.next()) continue;
+    
+    vector<float> K0s_y_vector;
+    vector<float> K0s_y_cuts_vector;
     
     vector<int> K0s_pT_bin_vector;
     vector<int> K0s_pT_bin_cuts_vector;
@@ -302,6 +314,7 @@ int main(int argc, char *argv[])
         if( eta_bin == -1 ) continue;
         //_____________________________________________________________________________________________
         
+        K0s_y_vector.push_back(K0_fourmom.Rapidity());
         
         K0s_pT_bin_vector.push_back(pT_bin_corr);
         K0s_eta_bin_vector.push_back(eta_bin);
@@ -344,6 +357,8 @@ int main(int argc, char *argv[])
         
         //add decay length cut on K0s
         
+        K0s_y_cuts_vector.push_back(K0_fourmom.Rapidity());
+        
         pi_star_cuts_vector.push_back(pi1_fourmom_star);
         
         K0s_thetaProdPlane_cuts[pT_bin][eta_bin]->Fill(mThetaProdPlane);
@@ -379,6 +394,7 @@ int main(int argc, char *argv[])
           
           K0s_K0s_cosThetaProdPlane->Fill(TMath::Cos(theta_star));
           K0s_K0s_cosThetaProdPlane_pT_hist[K0s_pT_bin_vector.at(iK0s1)][K0s_pT_bin_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));
+          if( K0s_y_vector.at(iK0s1) < 0.2 && K0s_y_vector.at(iK0s2) < 0.2  ) K0s_K0s_cosThetaProdPlane_pT_hist_tight_eta[K0s_pT_bin_vector.at(iK0s1)][K0s_pT_bin_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));
           K0s_K0s_cosThetaProdPlane_eta_hist[K0s_eta_bin_vector.at(iK0s1)][K0s_eta_bin_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));
         
         }
@@ -398,6 +414,7 @@ int main(int argc, char *argv[])
           
           K0s_K0s_cosThetaProdPlane_cuts->Fill(TMath::Cos(theta_star));
           K0s_K0s_cosThetaProdPlane_pT_cuts_hist[K0s_pT_bin_vector.at(iK0s1)][K0s_pT_bin_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));
+          if( K0s_y_cuts_vector.at(iK0s1) < 0.2 && K0s_y_cuts_vector.at(iK0s2) < 0.2  ) K0s_K0s_cosThetaProdPlane_pT_cuts_hist_tight_eta[K0s_pT_bin_vector.at(iK0s1)][K0s_pT_bin_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));
           K0s_K0s_cosThetaProdPlane_eta_cuts_hist[K0s_eta_bin_vector.at(iK0s1)][K0s_eta_bin_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));
         
         }

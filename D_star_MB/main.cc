@@ -50,8 +50,11 @@ int main(int argc, char *argv[])
   cout<<"Energy: "<<mEnergy<<endl;
   cout<<"Output file: "<<argv[3]<<endl;
 
-  const int nPtBins = 6;
-  float const pT_bins[nPtBins+1] = { 0,1,2,3,4,5,6 };
+  //const int nPtBins = 6;
+  //float const pT_bins[nPtBins+1] = { 0,1,2,3,4,5,6 };
+  
+  const int nPtBins = 10;
+  float const pT_bins[nPtBins+1] = { 5,6,7,8,9,10,11,12.5,15,17.5,20 };
 
   // Create Pythia instance and set it up to generate hard QCD processes
   // above pTHat = 20 GeV for pp collisions at 14 TeV.
@@ -59,6 +62,7 @@ int main(int argc, char *argv[])
   //pythia.readString("HardQCD:all = on");
   //pythia.readString("PhaseSpace:pTHatMin = 20.");
   if( mEnergy == 510) pythia.readString("Beams:eCM = 510"); //beam energy in GeV
+  else if( mEnergy == 500) pythia.readString("Beams:eCM = 500");
   else if( mEnergy == 200) pythia.readString("Beams:eCM = 200");
   else
   {
@@ -67,10 +71,12 @@ int main(int argc, char *argv[])
   
   }
   
+  pythia.readString("Random:setSeed = on");
+  pythia.readString("Random:seed = 0"); //should set random seed at start, after calling init()
+  
   pythia.readString("HardQCD:hardccbar = on");
   pythia.readString("HardQCD:gg2ccbar = on");
-  pythia.readString("HardQCD:qqbar2ccbar = on");
-  
+  pythia.readString("HardQCD:qqbar2ccbar = on");  
   
   
   pythia.readString("413:onMode = 0");
@@ -146,6 +152,10 @@ int main(int argc, char *argv[])
   TH2D *kaon_eta_vs_pion_eta_Dstar[nPtBins];
   TH2D *pion_eta_Dstar_vs_pion_eta_D0[nPtBins];
   
+  TH2D *kaon_pT_vs_pion_pT_D0[nPtBins];
+  TH2D *kaon_pT_vs_pion_pT_Dstar[nPtBins];
+  TH2D *pion_pT_Dstar_vs_pion_pT_D0[nPtBins];
+  
   TH1D *nCorr_K_pi_D0[nPtBins];
   TH1D *nCorr_K_pi_Dstar[nPtBins];
   TH1D *nCorr_pi_Dstar_pi_D0[nPtBins];
@@ -162,7 +172,11 @@ int main(int argc, char *argv[])
     
     kaon_eta_vs_pion_eta_D0[pTbin] = new TH2D(Form("kaon_eta_vs_pion_eta_D0_pT_%i", pTbin), Form("kaon_eta_vs_pion_eta_D0_pT_%i", pTbin), 40, -1, 1, 40, -1, 1); //phi of K and pi from decay of D0
     kaon_eta_vs_pion_eta_Dstar[pTbin] = new TH2D(Form("kaon_eta_vs_pion_eta_Dstar_pT_%i", pTbin), Form("kaon_eta_vs_pion_eta_Dstar_pT_%i", pTbin), 40, -1, 1, 40, -1, 1); //phi of K from decay of D0, and pi from decay of D*
-    pion_eta_Dstar_vs_pion_eta_D0[pTbin] = new TH2D(Form("pion_eta_Dstar_vs_pion_eta_D0_pT_%i", pTbin), Form("pion_eta_Dstar_vs_pion_eta_D0_pT_%i", pTbin), 40, -1, 1, 40, -1, 1); //phi of decay of pi from decay of D0 and pi from decay of D*  
+    pion_eta_Dstar_vs_pion_eta_D0[pTbin] = new TH2D(Form("pion_eta_Dstar_vs_pion_eta_D0_pT_%i", pTbin), Form("pion_eta_Dstar_vs_pion_eta_D0_pT_%i", pTbin), 40, -1, 1, 40, -1, 1); //phi of decay of pi from decay of D0 and pi from decay of D*
+    
+    kaon_pT_vs_pion_pT_D0[pTbin] = new TH2D(Form("kaon_pT_vs_pion_pT_D0_pT_%i", pTbin), Form("kaon_pT_vs_pion_pT_D0_pT_%i", pTbin), 200, 0, 20, 200, 0, 20); //pT of K and pi from decay of D0
+    kaon_pT_vs_pion_pT_Dstar[pTbin] = new TH2D(Form("kaon_pT_vs_pion_pT_Dstar_pT_%i", pTbin), Form("kaon_pT_vs_pion_pT_Dstar_pT_%i", pTbin), 200, 0, 20, 200, 0, 20); //pT of K from decay of D0, and pi from decay of D*
+    pion_pT_Dstar_vs_pion_pT_D0[pTbin] = new TH2D(Form("pion_pT_Dstar_vs_pion_pT_D0_pT_%i", pTbin), Form("pion_pT_Dstar_vs_pion_pT_D0_pT_%i", pTbin), 200, 0, 20, 200, 0, 20); //pT of decay of pi from decay of D0 and pi from decay of D* 
     
     nCorr_K_pi_D0[pTbin] = new TH1D(Form("nCorr_K_pi_D0_pT_%i", pTbin), Form("nCorr_K_pi_D0_pT_%i", pTbin), 2, 0, 2);
     nCorr_K_pi_Dstar[pTbin] = new TH1D(Form("nCorr_K_pi_Dstar_pT_%i", pTbin), Form("nCorr_K_pi_Dstar_pT_%i", pTbin), 2, 0, 2);
@@ -225,7 +239,9 @@ int main(int argc, char *argv[])
           //cout<<"First daughter is K"<<endl;
           
           if( fabs(pythia.event[firstDaughter_D0].eta()) > 1 ) continue;
+          
           if( fabs(pythia.event[secondDaughter_D0].eta()) > 1 ) continue;
+          if( pythia.event[secondDaughter_D0].e() < 2 ) continue; //energy cut on trigger pi in analysis
           
           kaon_phi_vs_pion_phi_D0[pT_bin]->Fill(pythia.event[firstDaughter_D0].phi(), pythia.event[secondDaughter_D0].phi());
           kaon_phi_vs_pion_phi_Dstar[pT_bin]->Fill(pythia.event[firstDaughter_D0].phi(), pythia.event[secondDaughter].phi());
@@ -234,6 +250,10 @@ int main(int argc, char *argv[])
           kaon_eta_vs_pion_eta_D0[pT_bin]->Fill(pythia.event[firstDaughter_D0].eta(), pythia.event[secondDaughter_D0].eta());
           kaon_eta_vs_pion_eta_Dstar[pT_bin]->Fill(pythia.event[firstDaughter_D0].eta(), pythia.event[secondDaughter].eta());
           pion_eta_Dstar_vs_pion_eta_D0[pT_bin]->Fill(pythia.event[secondDaughter].eta(), pythia.event[secondDaughter_D0].eta());
+          
+          kaon_pT_vs_pion_pT_D0[pT_bin]->Fill(pythia.event[firstDaughter_D0].pT(), pythia.event[secondDaughter_D0].pT());
+          kaon_pT_vs_pion_pT_Dstar[pT_bin]->Fill(pythia.event[firstDaughter_D0].pT(), pythia.event[secondDaughter].pT());
+          pion_pT_Dstar_vs_pion_pT_D0[pT_bin]->Fill(pythia.event[secondDaughter].pT(), pythia.event[secondDaughter_D0].pT());
           
           int bin_phi_pi_D0 = kaon_phi_vs_pion_phi_D0[pT_bin]->GetXaxis()->FindBin(pythia.event[secondDaughter_D0].phi());
           int bin_phi_K_D0 = kaon_phi_vs_pion_phi_D0[pT_bin]->GetXaxis()->FindBin(pythia.event[firstDaughter_D0].phi());
