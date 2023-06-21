@@ -1247,6 +1247,11 @@ int main( int argc, char *argv[])
         float L_decayL_US = L_pairVertex_US.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
         
         if(L_decayL_US < 20 || L_decayL_US > 250) cuts_flag = 0;
+        
+        //cos of pointing angle
+        float L_point_angle_US = L_pairVertex_US.Angle(L_fourmom_US_event.Vect());
+        if(cos(L_point_angle_US) < 0.996) cuts_flag = 0;
+                
         //if(L_fourmom.Pt() < 0.5) continue; //added pT cut - pT integrated in data starts at 0.5 GeV/c
         //if(L_fourmom.Rapidity() >= 1) continue;
         
@@ -1302,6 +1307,11 @@ int main( int argc, char *argv[])
         float L_decayL_LS = L_pairVertex_LS.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
         
         if(L_decayL_LS < 20 || L_decayL_LS > 250) cuts_flag = 0;
+        
+        //cos of pointing angle
+        float L_point_angle_LS = L_pairVertex_LS.Angle(L_fourmom_LS_event.Vect());
+        if(cos(L_point_angle_LS) < 0.996) cuts_flag = 0;
+        
         //if(L_fourmom.Pt() < 0.5) continue; //added pT cut - pT integrated in data starts at 0.5 GeV/c
         //if(L_fourmom.Rapidity() >= 1) continue;
         
@@ -1359,6 +1369,11 @@ int main( int argc, char *argv[])
         float Lbar_decayL_US = Lbar_pairVertex_US.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
         
         if(Lbar_decayL_US < 20 || Lbar_decayL_US > 250) cuts_flag = 0;
+        
+        //cos of pointing angle
+        float Lbar_point_angle_US = Lbar_pairVertex_US.Angle(Lbar_fourmom_US_event.Vect());
+        if(cos(Lbar_point_angle_US) < 0.996) cuts_flag = 0;
+        
         //if(L_fourmom.Pt() < 0.5) continue; //added pT cut - pT integrated in data starts at 0.5 GeV/c
         //if(L_fourmom.Rapidity() >= 1) continue;
         
@@ -1412,6 +1427,11 @@ int main( int argc, char *argv[])
         float Lbar_decayL_LS = Lbar_pairVertex_LS.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
         
         if(Lbar_decayL_LS < 20 || Lbar_decayL_LS > 250) cuts_flag = 0;
+        
+        //cos of pointing angle
+        float Lbar_point_angle_LS = Lbar_pairVertex_LS.Angle(Lbar_fourmom_LS_event.Vect());
+        if(cos(Lbar_point_angle_LS) < 0.996) cuts_flag = 0;
+        
         //if(L_fourmom.Pt() < 0.5) continue; //added pT cut - pT integrated in data starts at 0.5 GeV/c
         //if(L_fourmom.Rapidity() >= 1) continue;
         
