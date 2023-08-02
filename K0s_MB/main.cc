@@ -72,6 +72,74 @@ int findBinEta( TLorentzVector FourMom, float const *bins, const int nBins )
 }
 
 
+struct K0s_MC {
+  // general information
+  // lab frame
+  enum {
+    nK0s_MAX_MC=10 //check that thi is enough
+  };
+
+  //number of L
+  Int_t nK0s_MC;
+
+  //L momentum for eta and pT bins and for Delta eta and Delta phi
+  Float_t K0s_px_MC[nK0s_MAX_MC];
+  Float_t K0s_py_MC[nK0s_MAX_MC];
+  Float_t K0s_pz_MC[nK0s_MAX_MC];
+
+  //proton momntum in L rest frame
+  Float_t pi_pxStar_MC[nK0s_MAX_MC];
+  Float_t pi_pyStar_MC[nK0s_MAX_MC];
+  Float_t pi_pzStar_MC[nK0s_MAX_MC];
+
+  //for cuts
+  Float_t K0s_decayL_MC[nK0s_MAX_MC];
+  
+  Float_t pi1_pT_MC[nK0s_MAX_MC];
+  Float_t pi1_eta_MC[nK0s_MAX_MC];
+  
+  Float_t pi2_pT_MC[nK0s_MAX_MC];
+  Float_t pi2_eta_MC[nK0s_MAX_MC];
+
+};
+
+
+struct K0s_from_pairs {
+  // general information
+  // lab frame
+  enum {
+    nK0s_MAX=100 //check that thi is enough
+  };
+
+  //number of L
+  Int_t nK0s;
+
+  //L momentum for eta and pT bins and for Delta eta and Delta phi
+  Float_t K0s_px[nK0s_MAX];
+  Float_t K0s_py[nK0s_MAX];
+  Float_t K0s_pz[nK0s_MAX];
+  Float_t K0s_Minv[nK0s_MAX];
+
+  //proton momntum in L rest frame
+  Float_t pi_pxStar[nK0s_MAX];
+  Float_t pi_pyStar[nK0s_MAX];
+  Float_t pi_pzStar[nK0s_MAX];
+
+  //for cuts
+  Float_t K0s_decayL[nK0s_MAX];
+  Float_t K0s_theta[nK0s_MAX]; //pointing angle
+  
+  Float_t pi1_pT[nK0s_MAX];
+  Float_t pi1_eta[nK0s_MAX];
+  
+  Float_t pi2_pT[nK0s_MAX];
+  Float_t pi2_eta[nK0s_MAX];
+  
+  //pipi charge combinations
+  Int_t K0s_charge[nK0s_MAX]; //1 - pi+pi+, 0 - pi+pi-, -1 - pi-pi-
+};
+
+
 int main(int argc, char *argv[])
 {
 
@@ -149,248 +217,6 @@ int main(int argc, char *argv[])
 
   TLorentzVector pi1_fourmom;
   TLorentzVector pi2_fourmom;
-
-
-  //histograms
-  
-  //true MC
-  
-  //before cuts
-  TH1D *K0s_K0s_cosThetaProdPlane = new TH1D("K0s_K0s_cosThetaProdPlane", "K0s_K0s_cosThetaProdPlane", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_pT_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_eta_hist[nEtaBins][nEtaBins];
-  
-  
-  //after cuts  
-  TH1D *K0s_K0s_cosThetaProdPlane_cuts = new TH1D("K0s_K0s_cosThetaProdPlane_cuts", "K0s_K0s_cosThetaProdPlane_cuts", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_pT_cuts_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_eta_cuts_hist[nEtaBins][nEtaBins];
-  
-  //--------------------------------------------------------------------------------------------------------------------------------------
-  
-  //true MC mixed event
-  //before cuts
-  TH1D *K0s_K0s_cosThetaProdPlane_ME = new TH1D("K0s_K0s_cosThetaProdPlane_ME", "K0s_K0s_cosThetaProdPlane_ME", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_ME_pT_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_ME_eta_hist[nEtaBins][nEtaBins];
-  
-  
-  //after cuts  
-  TH1D *K0s_K0s_cosThetaProdPlane_ME_cuts = new TH1D("K0s_K0s_cosThetaProdPlane_ME_cuts", "K0s_K0s_cosThetaProdPlane_ME_cuts", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_ME_pT_cuts_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_ME_eta_cuts_hist[nEtaBins][nEtaBins];
-  
-  //_____________________________________________________________________________________________________________________________________________________________________ 
-  
-  //pi pi pairs to simulate combinatorial background
-  
-  //US matched to US before cuts
-  TH1D *K0s_K0s_cosThetaProdPlane_US = new TH1D("K0s_K0s_cosThetaProdPlane_US", "K0s_K0s_cosThetaProdPlane_US", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_pT_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_US_eta_hist[nEtaBins][nEtaBins];
-  
-  
-  //after cuts  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_cuts = new TH1D("K0s_K0s_cosThetaProdPlane_US_cuts", "K0s_K0s_cosThetaProdPlane_US_cuts", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_pT_cuts_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_US_eta_cuts_hist[nEtaBins][nEtaBins];
-  
-  //--------------------------------------------------------------------------------------------------------------------------------------
-  
-  //mixed event
-  //US matched to US before cuts
-  TH1D *K0s_K0s_cosThetaProdPlane_US_ME = new TH1D("K0s_K0s_cosThetaProdPlane_US_ME", "K0s_K0s_cosThetaProdPlane_US_ME", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_ME_pT_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_US_ME_eta_hist[nEtaBins][nEtaBins];
-  
-  
-  //after cuts  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_ME_cuts = new TH1D("K0s_K0s_cosThetaProdPlane_US_ME_cuts", "K0s_K0s_cosThetaProdPlane_US_ME_cuts", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_ME_pT_cuts_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_US_ME_eta_cuts_hist[nEtaBins][nEtaBins];
-  
-  //-------------------------------------------------------------------------------------------------------------------------------------
-  
-  //US matched to LS before cuts
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS = new TH1D("K0s_K0s_cosThetaProdPlane_US_LS", "K0s_K0s_cosThetaProdPlane_US_LS", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_pT_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_pT_hist_tight_eta[nPtBins_corr][nPtBins_corr];
-
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_eta_hist[nEtaBins][nEtaBins];
-  
-  
-  //after cuts  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_cuts = new TH1D("K0s_K0s_cosThetaProdPlane_US_LS_cuts", "K0s_K0s_cosThetaProdPlane_US_LS_cuts", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_pT_cuts_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_pT_cuts_hist_tight_eta[nPtBins_corr][nPtBins_corr];
-
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_eta_cuts_hist[nEtaBins][nEtaBins];
-  
-  //--------------------------------------------------------------------------------------------------------------------------------------
-  
-  //mixed event
-  //US matched to LS before cuts
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_ME = new TH1D("K0s_K0s_cosThetaProdPlane_US_LS_ME", "K0s_K0s_cosThetaProdPlane_US_LS_ME", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_ME_pT_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_ME_eta_hist[nEtaBins][nEtaBins];
-  
-  
-  //after cuts  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_ME_cuts = new TH1D("K0s_K0s_cosThetaProdPlane_US_LS_ME_cuts", "K0s_K0s_cosThetaProdPlane_US_LS_ME_cuts", 10, -1, 1);
-  
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_ME_pT_cuts_hist[nPtBins_corr][nPtBins_corr];
-  TH1D *K0s_K0s_cosThetaProdPlane_US_LS_ME_eta_cuts_hist[nEtaBins][nEtaBins];
-  
-  //_____________________________________________________________________________________________________________________________________________________________________ 
-  
-  
-  
-  //L-L correlation histograms in bins
-  for(unsigned int pTbin1 = 0; pTbin1 < nPtBins_corr; pTbin1++)
-  {
-    for(unsigned int pTbin2 = 0; pTbin2 < nPtBins_corr; pTbin2++)
-    {
-      //true MC
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_pT_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_pT_cuts_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //---------------------------------------------------------------------------------
-      
-      //true MC mixed event
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_ME_pT_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_ME_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_ME_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_ME_pT_cuts_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_ME_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_ME_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //_________________________________________________________________________________
-      
-      //pi pi pairs to simulate combinatorial background
-      //US matched to US
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_US_pT_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_US_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_US_pT_cuts_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_US_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //---------------------------------------------------------------------------------
-      
-      //mixed event
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_US_ME_pT_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_ME_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_US_ME_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_US_ME_pT_cuts_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_ME_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_US_ME_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //---------------------------------------------------------------------------------
-      
-      //US matched to LS
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_US_LS_pT_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_LS_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_US_LS_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_US_LS_pT_cuts_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_LS_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_US_LS_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //---------------------------------------------------------------------------------
-      
-      //mixed event
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_US_LS_ME_pT_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_LS_ME_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_US_LS_ME_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_US_LS_ME_pT_cuts_hist[pTbin1][pTbin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_LS_ME_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), Form("K0s_K0s_cosThetaProdPlane_US_LS_ME_cuts_pT1_%i_pT2_%i_hist", pTbin1, pTbin2), 10, -1, 1);      
-      
-
-    }
-  }
-
-  for(unsigned int etaBin1 = 0; etaBin1 < nEtaBins; etaBin1++)
-  {
-    for(unsigned int etaBin2 = 0; etaBin2 < nEtaBins; etaBin2++)
-    {
-      //true MC
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_eta_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_eta_cuts_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //---------------------------------------------------------------------------------
-      
-      //true MC mixed event
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_ME_eta_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_ME_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_ME_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_ME_eta_cuts_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_ME_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_ME_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //_________________________________________________________________________________
-      
-      //pi pi pairs to simulate combinatorial background
-      
-      //US matched to US
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_US_eta_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_US_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_US_eta_cuts_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_US_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //---------------------------------------------------------------------------------
-      
-      //mixed event
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_US_ME_eta_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_ME_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_US_ME_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_US_ME_eta_cuts_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_ME_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_US_ME_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //---------------------------------------------------------------------------------
-      
-      //US matched to LS
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_US_LS_eta_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_LS_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_US_LS_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_US_LS_eta_cuts_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_LS_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_US_LS_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //---------------------------------------------------------------------------------
-      
-      //mixed event
-      //before cuts
-      K0s_K0s_cosThetaProdPlane_US_LS_ME_eta_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_LS_ME_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_US_LS_ME_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-      
-      //after cuts
-      K0s_K0s_cosThetaProdPlane_US_LS_ME_eta_cuts_hist[etaBin1][etaBin2] = new TH1D(Form("K0s_K0s_cosThetaProdPlane_US_LS_ME_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), Form("K0s_K0s_cosThetaProdPlane_US_LS_ME_cuts_eta1_%i_eta2_%i_hist", etaBin1, etaBin2), 10, -1, 1);
-
-    }
-  }
-
-  //mixed event true K0s
-  
-  vector<TLorentzVector> pi_star_vector_ME;
-  
-  vector<int> K0s_pT_bin_vector_ME;
-  vector<int> K0s_eta_bin_vector_ME;
-  
-  
-  vector<TLorentzVector> pi_star_cuts_vector_ME;
-  
-  vector<int> K0s_pT_bin_cuts_vector_ME;
-  vector<int> K0s_eta_bin_cuts_vector_ME;
   
   //-----------------------------------------
   
@@ -403,21 +229,69 @@ int main(int argc, char *argv[])
   vector<TVector3> piPlus_origin_vector_event;
   vector<TVector3> piMinus_origin_vector_event;
   
-  //mixed event of pi pairs
-  //US
-  vector<TLorentzVector> pi_star_vector_US_ME;
-  vector<int> K0s_cuts_flag_US_ME;
+  //-----------------------------------------
   
-  vector<int> K0s_pT_bin_vector_US_ME;  
-  vector<int> K0s_eta_bin_vector_US_ME;
+  //trees to save L info
+  
+  TTree *K0s_MC_tree = new TTree("K0s_MC_tree", "K0s_MC_tree");
+  K0s_MC Kaon_MC;
+  
+  //number of L
+  K0s_MC_tree->Branch( "nK0s_MC", &Kaon_MC.nK0s_MC, "nK0s_MC/I" );
+
+  //L momentum for eta and pT bins and for Delta eta and Delta phi
+  K0s_MC_tree->Branch( "K0s_px_MC", &Kaon_MC.K0s_px_MC, "K0s_px_MC[nK0s_MC]/F" );
+  K0s_MC_tree->Branch( "K0s_py_MC", &Kaon_MC.K0s_py_MC, "K0s_py_MC[nK0s_MC]/F" );
+  K0s_MC_tree->Branch( "K0s_pz_MC", &Kaon_MC.K0s_pz_MC, "K0s_pz_MC[nK0s_MC]/F" );
+
+  //proton momntum in L rest frame
+  K0s_MC_tree->Branch( "pi_pxStar_MC", &Kaon_MC.pi_pxStar_MC, "pi_pxStar_MC[nK0s_MC]/F" );
+  K0s_MC_tree->Branch( "pi_pyStar_MC", &Kaon_MC.pi_pyStar_MC, "pi_pyStar_MC[nK0s_MC]/F" );
+  K0s_MC_tree->Branch( "pi_pzStar_MC", &Kaon_MC.pi_pzStar_MC, "pi_pzStar_MC[nK0s_MC]/F" );
+
+  //for cuts
+  K0s_MC_tree->Branch( "K0s_decayL_MC", &Kaon_MC.K0s_decayL_MC, "K0s_decayL_MC[nK0s_MC]/F" );
+  
+  K0s_MC_tree->Branch( "pi1_pT_MC", &Kaon_MC.pi1_pT_MC, "pi1_pT_MC[nK0s_MC]/F" );
+  K0s_MC_tree->Branch( "pi1_eta_MC", &Kaon_MC.pi1_eta_MC, "pi1_eta_MC[nK0s_MC]/F" );
+  
+  K0s_MC_tree->Branch( "pi2_pT_MC", &Kaon_MC.pi2_pT_MC, "pi2_pT_MC[nK0s_MC]/F" );
+  K0s_MC_tree->Branch( "pi2_eta_MC", &Kaon_MC.pi2_eta_MC, "pi2_eta_MC[nK0s_MC]/F" );
   
   
-  //US matched to LS
-  vector<TLorentzVector> pi_star_vector_LS_ME;
-  vector<int> K0s_cuts_flag_LS_ME;
+  //-------------------------------------------------------------------------------
   
-  vector<int> K0s_pT_bin_vector_LS_ME;  
-  vector<int> K0s_eta_bin_vector_LS_ME;  
+  TTree *K0s_tree = new TTree("K0s_tree", "K0s_tree");
+  K0s_from_pairs Kaon_from_pair;
+  
+  
+  //number of L
+  K0s_tree->Branch( "nK0s", &Kaon_from_pair.nK0s, "nK0s/I" );
+
+  //L momentum for eta and pT bins and for Delta eta and Delta phi
+  K0s_tree->Branch( "K0s_px", &Kaon_from_pair.K0s_px, "K0s_px[nK0s]/F" );
+  K0s_tree->Branch( "K0s_py", &Kaon_from_pair.K0s_py, "K0s_py[nK0s]/F" );
+  K0s_tree->Branch( "K0s_pz", &Kaon_from_pair.K0s_pz, "K0s_pz[nK0s]/F" );
+  K0s_tree->Branch( "K0s_Minv", &Kaon_from_pair.K0s_Minv, "K0s_Minv[nK0s]/F" );
+
+  //proton momntum in L rest frame
+  K0s_tree->Branch( "pi_pxStar", &Kaon_from_pair.pi_pxStar, "pi_pxStar[nK0s]/F" );
+  K0s_tree->Branch( "pi_pyStar", &Kaon_from_pair.pi_pyStar, "pi_pyStar[nK0s]/F" );
+  K0s_tree->Branch( "pi_pzStar", &Kaon_from_pair.pi_pzStar, "pi_pzStar[nK0s]/F" );
+
+  //for cuts
+  K0s_tree->Branch( "K0s_decayL", &Kaon_from_pair.K0s_decayL, "K0s_decayL[nK0s]/F" );
+  K0s_tree->Branch( "K0s_theta", &Kaon_from_pair.K0s_theta, "K0s_theta[nK0s]/F" );
+  
+  K0s_tree->Branch( "pi1_pT", &Kaon_from_pair.pi1_pT, "pi1_pT[nK0s]/F" );
+  K0s_tree->Branch( "pi1_eta", &Kaon_from_pair.pi1_eta, "pi1_eta[nK0s]/F" );
+  
+  K0s_tree->Branch( "pi2_pT", &Kaon_from_pair.pi2_pT, "pi2_pT[nK0s]/F" );
+  K0s_tree->Branch( "pi2_eta", &Kaon_from_pair.pi2_eta, "pi2_eta[nK0s]/F" );
+  
+  //L charge
+  K0s_tree->Branch( "K0s_charge", &Kaon_from_pair.K0s_charge , "K0s_charge[nK0s]/I" ); //1 - L, -1 - Lba
+ 
   
   
   // Begin event loop. Generate event; skip if generation aborted.
@@ -425,17 +299,9 @@ int main(int argc, char *argv[])
   {
     if (!pythia.next()) continue;
     
-    vector<float> K0s_y_vector;
-    vector<float> K0s_y_cuts_vector;
+    int iK0s_MC = 0;
     
-    vector<int> K0s_pT_bin_vector;
-    vector<int> K0s_pT_bin_cuts_vector;
-    
-    vector<int> K0s_eta_bin_vector;
-    vector<int> K0s_eta_bin_cuts_vector;
-    
-    vector<TLorentzVector> pi_star_vector;
-    vector<TLorentzVector> pi_star_cuts_vector;
+    int iK0s_from_pairs = 0;
 
     //loop over particles in event
     for (int i = 0; i < pythia.event.size(); ++i)
@@ -460,7 +326,7 @@ int main(int argc, char *argv[])
         }      
       }    
     
-      if( fabs(pythia.event[i].id()) == K0sPDGid)
+      if( fabs(pythia.event[i].id()) == K0sPDGid && iK0s_MC < 10)
       {
         //cout<<"Lambda found!"<<endl;
         
@@ -472,6 +338,26 @@ int main(int argc, char *argv[])
         //Lambda fourmomentum
         K0_fourmom.SetPxPyPzE(pythia.event[i].px(), pythia.event[i].py(), pythia.event[i].pz(), pythia.event[i].e());
         
+        if( fabs(K0_fourmom.Rapidity()) >= 1. ) continue;
+        
+        //save K0s momentum
+        Kaon_MC.K0s_px_MC[iK0s_MC] = K0_fourmom.Px();
+        Kaon_MC.K0s_py_MC[iK0s_MC] = K0_fourmom.Py();
+        Kaon_MC.K0s_pz_MC[iK0s_MC] = K0_fourmom.Pz();
+        
+        //daughter kinematics
+        pi1_fourmom.SetPxPyPzE(pythia.event[daughter1_Id].px(), pythia.event[daughter1_Id].py(), pythia.event[daughter1_Id].pz(), pythia.event[daughter1_Id].e());
+        
+        Kaon_MC.pi1_pT_MC[iK0s_MC] = pi1_fourmom.Pt();
+        Kaon_MC.pi1_eta_MC[iK0s_MC] = pi1_fourmom.Eta();
+        
+        
+        pi2_fourmom.SetPxPyPzE(pythia.event[daughter2_Id].px(), pythia.event[daughter2_Id].py(), pythia.event[daughter2_Id].pz(), pythia.event[daughter2_Id].e());
+        
+        Kaon_MC.pi2_pT_MC[iK0s_MC] = pi2_fourmom.Pt();
+        Kaon_MC.pi2_eta_MC[iK0s_MC] = pi2_fourmom.Eta();
+        
+        
         //Lambda MC decay veretex
         K0s_decay_vertex.SetXYZ(pythia.event[i].xDec(), pythia.event[i].yDec(), pythia.event[i].zDec());
         
@@ -479,208 +365,32 @@ int main(int argc, char *argv[])
         K0s_production_vertex.SetXYZ(pythia.event[i].xProd(), pythia.event[i].yProd(), pythia.event[i].zProd());
         
         TVector3 K0s_decayK0s_vect = K0s_decay_vertex - K0s_production_vertex;
-        float K0s_decayL = K0s_decayK0s_vect.Mag();
+        Kaon_MC.K0s_decayL_MC[iK0s_MC] = K0s_decayK0s_vect.Mag();        
         
-        if( fabs(K0_fourmom.Rapidity()) >= 1.) continue;
         
-        K0_fourmom_reverse.SetPxPyPzE(-pythia.event[i].px(), -pythia.event[i].py(), -pythia.event[i].pz(), pythia.event[i].e());
-
-        pi1_fourmom.SetPxPyPzE(pythia.event[daughter1_Id].px(), pythia.event[daughter1_Id].py(), pythia.event[daughter1_Id].pz(), pythia.event[daughter1_Id].e());
-        pi2_fourmom.SetPxPyPzE(pythia.event[daughter2_Id].px(), pythia.event[daughter2_Id].py(), pythia.event[daughter2_Id].pz(), pythia.event[daughter2_Id].e());      
+        K0_fourmom_reverse.SetPxPyPzE(-pythia.event[i].px(), -pythia.event[i].py(), -pythia.event[i].pz(), pythia.event[i].e());              
 
         TLorentzVector pi1_fourmom_star = pi1_fourmom;
         pi1_fourmom_star.Boost(K0_fourmom_reverse.BoostVector());  
-
-        TVector3 beamVector(0.,0.,1.); //unity vector along the beam axis
-        TVector3 mProdPlane = beamVector.Cross(K0_fourmom.Vect());
-        mProdPlane = ( mProdPlane )*(1./mProdPlane.Mag() );
-
-        float mThetaProdPlane = mProdPlane.Angle(pi1_fourmom_star.Vect());
         
-        //fill all histograms for all pT and centrality bins
-        int pT_bin = -1;
-
-        //find pT bin of Lambda
-        for(int j = 0; j < nPtBins; j++) //loop over pT bins
-        {
-          if(K0_fourmom.Pt() > pT_bins[j] && K0_fourmom.Pt() <= pT_bins[j+1])
-          {
-            pT_bin = j;
-            break; //stop after pT bin is found
-          }
-        }
-
-        if( pT_bin == -1 ) continue;
+        Kaon_MC.pi_pxStar_MC[iK0s_MC] = pi1_fourmom_star.Px();
+        Kaon_MC.pi_pyStar_MC[iK0s_MC] = pi1_fourmom_star.Py();
+        Kaon_MC.pi_pzStar_MC[iK0s_MC] = pi1_fourmom_star.Pz();
         
         
-        int pT_bin_corr = -1;
-
-        //find pT bin of Lambda
-        for(int j = 0; j < nPtBins_corr; j++) //loop over pT bins
-        {
-          if(K0_fourmom.Pt() > pT_bins_corr[j] && K0_fourmom.Pt() <= pT_bins_corr[j+1])
-          {
-            pT_bin_corr = j;
-            break; //stop after pT bin is found
-          }
-        }
-        
-        if( pT_bin_corr == -1 ) continue;
-
-
-        //fill all histograms for all eta and centrality bins
-        int eta_bin = -1;
-
-        //find eta bin of Lambda
-        for(int j = 0; j < nEtaBins; j++) //loop over eta bins
-        {
-          if(K0_fourmom.Eta() > eta_bins[j] && K0_fourmom.Eta() <= eta_bins[j+1])
-          {
-            eta_bin = j;
-            break; //stop after eta bin is found
-          }
-        }
-
-        if( eta_bin == -1 ) continue;
-        //_____________________________________________________________________________________________
-        
-        K0s_y_vector.push_back(K0_fourmom.Rapidity());
-        
-        K0s_pT_bin_vector.push_back(pT_bin_corr);
-        K0s_eta_bin_vector.push_back(eta_bin);
-        
-        pi_star_vector.push_back(pi1_fourmom_star);
-       
-        //_____________________________________________________________________________________________
-        
-        
-        //fill histograms after cuts
-        
-        //K0s cuts
-        //decay length cuts in mm (default PYTHIA units)
-        if(K0s_decayL < 5 || K0s_decayL > 250) continue;
-        
-        
-        //daughter cuts
-        if( fabs(pi1_fourmom.Eta()) >= 1. || fabs(pi2_fourmom.Eta()) >= 1. ) continue;       
-        if( pi1_fourmom.Pt() < 0.15 || pi1_fourmom.Pt() > 20. ) continue;
-        if( pi2_fourmom.Pt() < 0.15 || pi2_fourmom.Pt() > 20. ) continue;
-        
-        //add decay length cut on K0s
-        
-        K0s_y_cuts_vector.push_back(K0_fourmom.Rapidity());
-        
-        K0s_pT_bin_cuts_vector.push_back(pT_bin_corr);
-        K0s_eta_bin_cuts_vector.push_back(eta_bin);
-        
-        pi_star_cuts_vector.push_back(pi1_fourmom_star);     
-        
+        iK0s_MC++;
 
       }//end if K0s
     
     }//end particle loop
     
-    //fill K0s-K0s correlation before cuts
-    if(pi_star_vector.size() > 1)
-    {
-      for(unsigned int iK0s1 = 0; iK0s1 < pi_star_vector.size(); iK0s1++)
-      {
-        for(unsigned int iK0s2 = iK0s1+1; iK0s2 < pi_star_vector.size(); iK0s2++)
-        {
-          double theta_star = pi_star_vector.at(iK0s1).Angle(pi_star_vector.at(iK0s2).Vect());
-          
-          K0s_K0s_cosThetaProdPlane->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_pT_hist[K0s_pT_bin_vector.at(iK0s1)][K0s_pT_bin_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_eta_hist[K0s_eta_bin_vector.at(iK0s1)][K0s_eta_bin_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));        
-        }
-      
-      }  
+    Kaon_MC.nK0s_MC = iK0s_MC;
     
-    }
+    if(iK0s_MC > 0) K0s_MC_tree->Fill(); //fill tree only for events with more than 1 K0s
     
-    //-------------------------------------------------------------------
     
-    //mixed event before cuts
-    if( pi_star_vector.size() == 1 && pi_star_vector_ME.size() < 1e4)
-    {
-      pi_star_vector_ME.push_back(pi_star_vector.at(0));
+    //_____________________________________________________________________________________________
 
-      K0s_pT_bin_vector_ME.push_back(K0s_pT_bin_vector.at(0));
-      K0s_eta_bin_vector_ME.push_back(K0s_eta_bin_vector.at(0));
-    }
-
-    //_____________________________________________________________________________________________________________________________________________________________________
-    
-    //fill K0s-K0s correlation after cuts
-    if(pi_star_cuts_vector.size() > 1)
-    {
-      for(unsigned int iK0s1 = 0; iK0s1 < pi_star_cuts_vector.size(); iK0s1++)
-      {
-        for(unsigned int iK0s2 = iK0s1+1; iK0s2 < pi_star_cuts_vector.size(); iK0s2++)
-        {
-          double theta_star = pi_star_cuts_vector.at(iK0s1).Angle(pi_star_cuts_vector.at(iK0s2).Vect());
-          
-          K0s_K0s_cosThetaProdPlane_cuts->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_pT_cuts_hist[K0s_pT_bin_cuts_vector.at(iK0s1)][K0s_pT_bin_cuts_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_eta_cuts_hist[K0s_eta_bin_cuts_vector.at(iK0s1)][K0s_eta_bin_cuts_vector.at(iK0s2)]->Fill(TMath::Cos(theta_star));        
-        }
-      
-      }  
-    
-    }
-    
-    //-------------------------------------------------------------------
-    
-    //mixed event after cuts
-    if( pi_star_cuts_vector.size() == 1 && pi_star_cuts_vector_ME.size() < 1e4)
-    {
-      pi_star_cuts_vector_ME.push_back(pi_star_cuts_vector.at(0));
-
-      K0s_pT_bin_cuts_vector_ME.push_back(K0s_pT_bin_cuts_vector.at(0));
-      K0s_eta_bin_cuts_vector_ME.push_back(K0s_eta_bin_cuts_vector.at(0));
-    }
-    
-    //_____________________________________________________________________________________________________________________________________________________________________
-    
-    //clear vectors
-    
-    K0s_y_vector.clear();
-        
-    K0s_pT_bin_vector.clear();
-    K0s_eta_bin_vector.clear();
-    
-    pi_star_vector.clear();
-    
-    
-    K0s_y_cuts_vector.clear();
-        
-    K0s_pT_bin_cuts_vector.clear();
-    K0s_eta_bin_cuts_vector.clear();
-    
-    pi_star_cuts_vector.clear();
-    
-    //_____________________________________________________________________________________________________________________________________________________________________
-    
-    //analyze pi pairs
-    
-    //L and Lbar "candidates" from pi p pairs
-    vector<TLorentzVector> K0s_vector_US;
-    vector<int> K0s_pT_bin_vector_US;
-    vector<int> K0s_eta_bin_vector_US;
-    vector<int> K0s_cuts_flag_US; //flag if pair passed analysis cuts
-    vector<TLorentzVector> pi_star_vector_US; //to store p fourmomentum in L (pi p pair) rest frame
-    vector<int> pi1_index_vector_US; //to store pi1 index for auto-correlation check for same-sign pairs
-    vector<int> pi2_index_vector_US; //to store pi2 index for auto-correlation check for same-sign pairs
-    
-    
-    vector<TLorentzVector> K0s_vector_LS;
-    vector<int> K0s_pT_bin_vector_LS;
-    vector<int> K0s_eta_bin_vector_LS;
-    vector<int> K0s_cuts_flag_LS; //flag if pair passed analysis cuts
-    vector<TLorentzVector> pi_star_vector_LS;
-    vector<int> pi1_index_vector_LS; //to store pi1 index for auto-correlation check for same-sign pairs
-    vector<int> pi2_index_vector_LS; //to store pi2 index for auto-correlation check for same-sign pairs 
-    
     
     //pair pions
     
@@ -691,12 +401,24 @@ int main(int argc, char *argv[])
       {
         TLorentzVector K0s_fourmom_US_event = piPlus_vector_event.at(pi1_index) + piMinus_vector_event.at(pi2_index);
         
+        if( iK0s_from_pairs >= 100  ) continue;
         if( fabs( K0s_fourmom_US_event.Rapidity() ) > 1 ) continue;
+        if( K0s_fourmom_US_event.M() < 0.488 || K0s_fourmom_US_event.M() > 0.51 ) continue;
         
-        int pT_bin_K0s_US = findBinPt( K0s_fourmom_US_event, pT_bins_corr, nPtBins_corr );
-        int eta_bin_K0s_US = findBinEta( K0s_fourmom_US_event, eta_bins, nEtaBins );
+        Kaon_from_pair.K0s_px[iK0s_from_pairs] = K0s_fourmom_US_event.Px();
+        Kaon_from_pair.K0s_py[iK0s_from_pairs] = K0s_fourmom_US_event.Py();
+        Kaon_from_pair.K0s_pz[iK0s_from_pairs] = K0s_fourmom_US_event.Pz();
+        Kaon_from_pair.K0s_Minv[iK0s_from_pairs] = K0s_fourmom_US_event.M();
         
-        if( pT_bin_K0s_US < 0 || eta_bin_K0s_US < 0 ) continue;        
+        
+        //daughter kinematics
+        Kaon_from_pair.pi1_pT[iK0s_from_pairs] = piPlus_vector_event.at(pi1_index).Pt();
+        Kaon_from_pair.pi1_eta[iK0s_from_pairs] = piPlus_vector_event.at(pi1_index).Eta();
+        
+        Kaon_from_pair.pi2_pT[iK0s_from_pairs] = piMinus_vector_event.at(pi2_index).Pt();
+        Kaon_from_pair.pi2_eta[iK0s_from_pairs] = piMinus_vector_event.at(pi2_index).Eta();
+        
+        
         
         TLorentzVector K0s_fourmom_reverse_US_event;
         K0s_fourmom_reverse_US_event.SetPxPyPzE(-K0s_fourmom_US_event.Px(), -K0s_fourmom_US_event.Py(), -K0s_fourmom_US_event.Pz(), K0s_fourmom_US_event.E());
@@ -704,49 +426,51 @@ int main(int argc, char *argv[])
         TLorentzVector pi_star_US = piPlus_vector_event.at(pi1_index);
         pi_star_US.Boost(K0s_fourmom_reverse_US_event.BoostVector()); //boost p 4-momntum to L rest frame
         
-        
-        //save info (before cuts)
-        K0s_vector_US.push_back(K0s_fourmom_US_event);
-        K0s_pT_bin_vector_US.push_back(pT_bin_K0s_US);
-        K0s_eta_bin_vector_US.push_back(eta_bin_K0s_US);
-        pi_star_vector_US.push_back(pi_star_US);
-        
-        pi1_index_vector_US.push_back(pi1_index);
-        pi2_index_vector_US.push_back(pi2_index);
+        Kaon_from_pair.pi_pxStar[iK0s_from_pairs] = pi_star_US.Px();
+        Kaon_from_pair.pi_pyStar[iK0s_from_pairs] = pi_star_US.Py();
+        Kaon_from_pair.pi_pzStar[iK0s_from_pairs] = pi_star_US.Pz();
         
         
-        //cuts        
-        int cuts_flag = 1;
         //decay length cuts in mm (default PYTHIA units)
         TVector3 K0s_pairVertex_US = ( piPlus_origin_vector_event.at(pi1_index) + piMinus_origin_vector_event.at(pi2_index) )*0.5; //secondary vertex of pi p pair
-        float K0s_decayK0s_US = K0s_pairVertex_US.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
+        Kaon_from_pair.K0s_decayL[iK0s_from_pairs] = K0s_pairVertex_US.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
         
-        if(K0s_decayK0s_US < 5 || K0s_decayK0s_US > 250) cuts_flag = 0;
-        //if(K0s_fourmom.Pt() < 0.5) continue; //added pT cut - pT integrated in data starts at 0.5 GeV/c
-        //if(K0s_fourmom.Rapidity() >= 1) continue;
         
-        //daughter cuts
-        if( fabs(piPlus_vector_event.at(pi1_index).Eta()) >= 1. || fabs(piMinus_vector_event.at(pi2_index).Eta()) >= 1. )  cuts_flag = 0;       
-        if( piPlus_vector_event.at(pi1_index).Pt() < 0.15 || piPlus_vector_event.at(pi1_index).Pt() > 20. )  cuts_flag = 0;
-        if( piMinus_vector_event.at(pi2_index).Pt() < 0.15 || piMinus_vector_event.at(pi2_index).Pt() > 20. )  cuts_flag = 0;
         
-        if( K0s_fourmom_US_event.M() < 0.488 || K0s_fourmom_US_event.M() > 0.51 ) cuts_flag = 0; //approximate Minv window from data
+        float K0s_point_angle_US = K0s_pairVertex_US.Angle(K0s_fourmom_US_event.Vect());
+        Kaon_from_pair.K0s_theta[iK0s_from_pairs] = K0s_point_angle_US;
         
-        K0s_cuts_flag_US.push_back(cuts_flag);
-      
+        
+        Kaon_from_pair.K0s_charge[iK0s_from_pairs] = 0; //US pi pair
+        
+        
+        iK0s_from_pairs++;
+     
       }
       
-      //LS with pi+ only, pi- is lower
+      //LS with pi+ only, with pi- is lower
       for( unsigned int pi2_index = pi1_index+1; pi2_index < piPlus_vector_event.size(); pi2_index++ )
       {
         TLorentzVector K0s_fourmom_LS_event = piPlus_vector_event.at(pi1_index) + piPlus_vector_event.at(pi2_index);
         
+        if( iK0s_from_pairs >= 100  ) continue;
         if( fabs( K0s_fourmom_LS_event.Rapidity() ) > 1 ) continue;
+        if( K0s_fourmom_LS_event.M() < 0.488 || K0s_fourmom_LS_event.M() > 0.51 ) continue;
         
-        int pT_bin_K0s_LS = findBinPt( K0s_fourmom_LS_event, pT_bins_corr, nPtBins_corr );
-        int eta_bin_K0s_LS = findBinEta( K0s_fourmom_LS_event, eta_bins, nEtaBins );
+        Kaon_from_pair.K0s_px[iK0s_from_pairs] = K0s_fourmom_LS_event.Px();
+        Kaon_from_pair.K0s_py[iK0s_from_pairs] = K0s_fourmom_LS_event.Py();
+        Kaon_from_pair.K0s_pz[iK0s_from_pairs] = K0s_fourmom_LS_event.Pz();
+        Kaon_from_pair.K0s_Minv[iK0s_from_pairs] = K0s_fourmom_LS_event.M();
         
-        if( pT_bin_K0s_LS < 0 || eta_bin_K0s_LS < 0 ) continue;        
+        
+        //daughter kinematics
+        Kaon_from_pair.pi1_pT[iK0s_from_pairs] = piPlus_vector_event.at(pi1_index).Pt();
+        Kaon_from_pair.pi1_eta[iK0s_from_pairs] = piPlus_vector_event.at(pi1_index).Eta();
+        
+        Kaon_from_pair.pi2_pT[iK0s_from_pairs] = piPlus_vector_event.at(pi2_index).Pt();
+        Kaon_from_pair.pi2_eta[iK0s_from_pairs] = piPlus_vector_event.at(pi2_index).Eta();
+        
+            
         
         TLorentzVector K0s_fourmom_reverse_LS_event;
         K0s_fourmom_reverse_LS_event.SetPxPyPzE(-K0s_fourmom_LS_event.Px(), -K0s_fourmom_LS_event.Py(), -K0s_fourmom_LS_event.Pz(), K0s_fourmom_LS_event.E());
@@ -754,35 +478,23 @@ int main(int argc, char *argv[])
         TLorentzVector pi_star_LS = piPlus_vector_event.at(pi1_index);
         pi_star_LS.Boost(K0s_fourmom_reverse_LS_event.BoostVector()); //boost p 4-momntum to L rest frame
         
+        Kaon_from_pair.pi_pxStar[iK0s_from_pairs] = pi_star_LS.Px();
+        Kaon_from_pair.pi_pyStar[iK0s_from_pairs] = pi_star_LS.Py();
+        Kaon_from_pair.pi_pzStar[iK0s_from_pairs] = pi_star_LS.Pz();
+
         
-        //save info (before cuts)
-        K0s_vector_LS.push_back(K0s_fourmom_LS_event);
-        K0s_pT_bin_vector_LS.push_back(pT_bin_K0s_LS);
-        K0s_eta_bin_vector_LS.push_back(eta_bin_K0s_LS);
-        pi_star_vector_LS.push_back(pi_star_LS);
-        
-        pi1_index_vector_LS.push_back(pi1_index);
-        pi2_index_vector_LS.push_back(pi2_index);
-        
-        
-        //cuts        
-        int cuts_flag = 1;
         //decay length cuts in mm (default PYTHIA units)
         TVector3 K0s_pairVertex_LS = ( piPlus_origin_vector_event.at(pi1_index) + piPlus_origin_vector_event.at(pi2_index) )*0.5; //secondary vertex of pi p pair
-        float K0s_decayK0s_LS = K0s_pairVertex_LS.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
+        Kaon_from_pair.K0s_decayL[iK0s_from_pairs] = K0s_pairVertex_LS.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
+   
+        float K0s_point_angle_LS = K0s_pairVertex_LS.Angle(K0s_fourmom_LS_event.Vect());
+        Kaon_from_pair.K0s_theta[iK0s_from_pairs] = K0s_point_angle_LS;
         
-        if(K0s_decayK0s_LS < 5 || K0s_decayK0s_LS > 250) cuts_flag = 0;
-        //if(K0s_fourmom.Pt() < 0.5) continue; //added pT cut - pT integrated in data starts at 0.5 GeV/c
-        //if(K0s_fourmom.Rapidity() >= 1) continue;
         
-        //daughter cuts
-        if( fabs(piPlus_vector_event.at(pi1_index).Eta()) >= 1. || fabs(piPlus_vector_event.at(pi2_index).Eta()) >= 1. )  cuts_flag = 0;       
-        if( piPlus_vector_event.at(pi1_index).Pt() < 0.15 || piPlus_vector_event.at(pi1_index).Pt() > 20. )  cuts_flag = 0;
-        if( piPlus_vector_event.at(pi2_index).Pt() < 0.15 || piPlus_vector_event.at(pi2_index).Pt() > 20. )  cuts_flag = 0;
+        Kaon_from_pair.K0s_charge[iK0s_from_pairs] = 1; //LS pi+pi+ pair
         
-        if( K0s_fourmom_LS_event.M() < 0.488 || K0s_fourmom_LS_event.M() > 0.51 ) cuts_flag = 0; //approximate Minv window from data
         
-        K0s_cuts_flag_LS.push_back(cuts_flag);
+        iK0s_from_pairs++;
       
       
       }
@@ -796,12 +508,24 @@ int main(int argc, char *argv[])
       {
         TLorentzVector K0s_fourmom_LS_event = piMinus_vector_event.at(pi1_index) + piMinus_vector_event.at(pi2_index);
         
+        if( iK0s_from_pairs >= 100  ) continue;
         if( fabs( K0s_fourmom_LS_event.Rapidity() ) > 1 ) continue;
+        if( K0s_fourmom_LS_event.M() < 0.488 || K0s_fourmom_LS_event.M() > 0.51 ) continue;
         
-        int pT_bin_K0s_LS = findBinPt( K0s_fourmom_LS_event, pT_bins_corr, nPtBins_corr );
-        int eta_bin_K0s_LS = findBinEta( K0s_fourmom_LS_event, eta_bins, nEtaBins );
         
-        if( pT_bin_K0s_LS < 0 || eta_bin_K0s_LS < 0 ) continue;        
+        Kaon_from_pair.K0s_px[iK0s_from_pairs] = K0s_fourmom_LS_event.Px();
+        Kaon_from_pair.K0s_py[iK0s_from_pairs] = K0s_fourmom_LS_event.Py();
+        Kaon_from_pair.K0s_pz[iK0s_from_pairs] = K0s_fourmom_LS_event.Pz();
+        Kaon_from_pair.K0s_Minv[iK0s_from_pairs] = K0s_fourmom_LS_event.M();
+        
+        
+        //daughter kinematics
+        Kaon_from_pair.pi1_pT[iK0s_from_pairs] = piMinus_vector_event.at(pi1_index).Pt();
+        Kaon_from_pair.pi1_eta[iK0s_from_pairs] = piMinus_vector_event.at(pi1_index).Eta();
+        
+        Kaon_from_pair.pi2_pT[iK0s_from_pairs] = piMinus_vector_event.at(pi2_index).Pt();
+        Kaon_from_pair.pi2_eta[iK0s_from_pairs] = piMinus_vector_event.at(pi2_index).Eta();
+        
         
         TLorentzVector K0s_fourmom_reverse_LS_event;
         K0s_fourmom_reverse_LS_event.SetPxPyPzE(-K0s_fourmom_LS_event.Px(), -K0s_fourmom_LS_event.Py(), -K0s_fourmom_LS_event.Pz(), K0s_fourmom_LS_event.E());
@@ -809,39 +533,34 @@ int main(int argc, char *argv[])
         TLorentzVector pi_star_LS = piMinus_vector_event.at(pi1_index);
         pi_star_LS.Boost(K0s_fourmom_reverse_LS_event.BoostVector()); //boost p 4-momntum to L rest frame
         
-        
-        //save info (before cuts)
-        K0s_vector_LS.push_back(K0s_fourmom_LS_event);
-        K0s_pT_bin_vector_LS.push_back(pT_bin_K0s_LS);
-        K0s_eta_bin_vector_LS.push_back(eta_bin_K0s_LS);
-        pi_star_vector_LS.push_back(pi_star_LS);
-        
-        pi1_index_vector_LS.push_back(pi1_index);
-        pi2_index_vector_LS.push_back(pi2_index);
+        Kaon_from_pair.pi_pxStar[iK0s_from_pairs] = pi_star_LS.Px();
+        Kaon_from_pair.pi_pyStar[iK0s_from_pairs] = pi_star_LS.Py();
+        Kaon_from_pair.pi_pzStar[iK0s_from_pairs] = pi_star_LS.Pz();
         
         
-        //cuts        
-        int cuts_flag = 1;
         //decay length cuts in mm (default PYTHIA units)
         TVector3 K0s_pairVertex_LS = ( piMinus_origin_vector_event.at(pi1_index) + piMinus_origin_vector_event.at(pi2_index) )*0.5; //secondary vertex of pi p pair
-        float K0s_decayK0s_LS = K0s_pairVertex_LS.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
+        Kaon_from_pair.K0s_decayL[iK0s_from_pairs] = K0s_pairVertex_LS.Mag(); //decay length of pi p pair assuming PV at (0,0,0)
+              
         
-        if(K0s_decayK0s_LS < 5 || K0s_decayK0s_LS > 250) cuts_flag = 0;
-        //if(K0s_fourmom.Pt() < 0.5) continue; //added pT cut - pT integrated in data starts at 0.5 GeV/c
-        //if(K0s_fourmom.Rapidity() >= 1) continue;
+        float K0s_point_angle_LS = K0s_pairVertex_LS.Angle(K0s_fourmom_LS_event.Vect());
+        Kaon_from_pair.K0s_theta[iK0s_from_pairs] = K0s_point_angle_LS;
         
-        //daughter cuts
-        if( fabs(piMinus_vector_event.at(pi1_index).Eta()) >= 1. || fabs(piMinus_vector_event.at(pi2_index).Eta()) >= 1. )  cuts_flag = 0;       
-        if( piMinus_vector_event.at(pi1_index).Pt() < 0.15 || piMinus_vector_event.at(pi1_index).Pt() > 20. )  cuts_flag = 0;
-        if( piMinus_vector_event.at(pi2_index).Pt() < 0.15 || piMinus_vector_event.at(pi2_index).Pt() > 20. )  cuts_flag = 0;
         
-        if( K0s_fourmom_LS_event.M() < 0.488 || K0s_fourmom_LS_event.M() > 0.51 ) cuts_flag = 0; //approximate Minv window from data
+        Kaon_from_pair.K0s_charge[iK0s_from_pairs] = -1; //LS pi-pi- pair
         
-        K0s_cuts_flag_LS.push_back(cuts_flag);
+        
+        iK0s_from_pairs++;
+        
       
       }
       
     }
+    
+    
+    Kaon_from_pair.nK0s = iK0s_from_pairs;
+    
+    if(iK0s_from_pairs > 0) K0s_tree->Fill(); //fill tree only for events with more than 1 K0s
     
     
     //clear pi vectors for next event
@@ -853,237 +572,9 @@ int main(int argc, char *argv[])
     piMinus_origin_vector_event.clear();
     
     //_____________________________________________________________________________________________________________________________________________________________________
-    
-    //pair K0s
-    
-    //US paired with US
-    if( K0s_vector_US.size() > 1 )
-    {
-      for( unsigned int iK0s1 = 0; iK0s1 < K0s_vector_US.size(); iK0s1++ )
-      {
-        for( unsigned int iK0s2 = iK0s1+1; iK0s2 < K0s_vector_US.size(); iK0s2++ )
-        {
-          //check auto-correlation
-          if( pi1_index_vector_US.at(iK0s1) == pi1_index_vector_US.at(iK0s2) ) continue;
-          if( pi2_index_vector_US.at(iK0s1) == pi2_index_vector_US.at(iK0s2) ) continue;
-          
-          float theta_star = pi_star_vector_US.at(iK0s1).Angle(pi_star_vector_US.at(iK0s2).Vect());
-          
-          K0s_K0s_cosThetaProdPlane_US->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_US_pT_hist[K0s_pT_bin_vector_US.at(iK0s1)][K0s_pT_bin_vector_US.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_US_eta_hist[K0s_eta_bin_vector_US.at(iK0s1)][K0s_eta_bin_vector_US.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-          
-          if( K0s_cuts_flag_US.at(iK0s1) == 1 && K0s_cuts_flag_US.at(iK0s2) == 1) //both K0s in pair passed cuts
-          {
-            K0s_K0s_cosThetaProdPlane_US_cuts->Fill(TMath::Cos(theta_star));
-            K0s_K0s_cosThetaProdPlane_US_pT_cuts_hist[K0s_pT_bin_vector_US.at(iK0s1)][K0s_pT_bin_vector_US.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-            K0s_K0s_cosThetaProdPlane_US_eta_cuts_hist[K0s_eta_bin_vector_US.at(iK0s1)][K0s_eta_bin_vector_US.at(iK0s2)]->Fill(TMath::Cos(theta_star));          
-          }
-        
-        }
-        
-      }
-    
-    }
-        
-    //-------------------------------------------------
-    
-    //US paired with LS
-    int nFilK0s_K0s_K0s_US_LS = 0;
-    
-    if( K0s_vector_US.size() > 0 && K0s_vector_LS.size() )
-    {
-      for( unsigned int iK0s1 = 0; iK0s1 < K0s_vector_US.size(); iK0s1++ )
-      {
-        for( unsigned int iK0s2 = 0; iK0s2 < K0s_vector_LS.size(); iK0s2++ )
-        {
-          //check auto-correlation
-          if( pi1_index_vector_US.at(iK0s1) == pi1_index_vector_LS.at(iK0s2) ) continue;
-          if( pi2_index_vector_US.at(iK0s1) == pi2_index_vector_LS.at(iK0s2) ) continue;
-          if( pi1_index_vector_US.at(iK0s1) == pi2_index_vector_LS.at(iK0s2) ) continue;
-          if( pi2_index_vector_US.at(iK0s1) == pi1_index_vector_LS.at(iK0s2) ) continue;
-          
-          if( nFilK0s_K0s_K0s_US_LS % 2 == 0 )
-          {
-            float theta_star = pi_star_vector_US.at(iK0s1).Angle(pi_star_vector_LS.at(iK0s2).Vect());
-          
-            K0s_K0s_cosThetaProdPlane_US_LS->Fill(TMath::Cos(theta_star));
-            K0s_K0s_cosThetaProdPlane_US_LS_pT_hist[K0s_pT_bin_vector_US.at(iK0s1)][K0s_pT_bin_vector_LS.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-            K0s_K0s_cosThetaProdPlane_US_LS_eta_hist[K0s_eta_bin_vector_US.at(iK0s1)][K0s_eta_bin_vector_LS.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-            
-            if( K0s_cuts_flag_US.at(iK0s1) == 1 && K0s_cuts_flag_LS.at(iK0s2) == 1) //both K0s in pair passed cuts
-            {
-              K0s_K0s_cosThetaProdPlane_US_LS_cuts->Fill(TMath::Cos(theta_star));
-              K0s_K0s_cosThetaProdPlane_US_LS_pT_cuts_hist[K0s_pT_bin_vector_US.at(iK0s1)][K0s_pT_bin_vector_LS.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-              K0s_K0s_cosThetaProdPlane_US_LS_eta_cuts_hist[K0s_eta_bin_vector_US.at(iK0s1)][K0s_eta_bin_vector_LS.at(iK0s2)]->Fill(TMath::Cos(theta_star));          
-            }
-          
-          }
-          else
-          {
-            float theta_star = pi_star_vector_LS.at(iK0s2).Angle(pi_star_vector_US.at(iK0s1).Vect());
-          
-            K0s_K0s_cosThetaProdPlane_US_LS->Fill(TMath::Cos(theta_star));
-            K0s_K0s_cosThetaProdPlane_US_LS_pT_hist[K0s_pT_bin_vector_LS.at(iK0s2)][K0s_pT_bin_vector_US.at(iK0s1)]->Fill(TMath::Cos(theta_star));
-            K0s_K0s_cosThetaProdPlane_US_LS_eta_hist[K0s_eta_bin_vector_LS.at(iK0s2)][K0s_eta_bin_vector_US.at(iK0s1)]->Fill(TMath::Cos(theta_star));
-            
-            if( K0s_cuts_flag_US.at(iK0s1) == 1 && K0s_cuts_flag_LS.at(iK0s2) == 1) //both K0s in pair passed cuts
-            {
-              K0s_K0s_cosThetaProdPlane_US_LS_cuts->Fill(TMath::Cos(theta_star));
-              K0s_K0s_cosThetaProdPlane_US_LS_pT_cuts_hist[K0s_pT_bin_vector_LS.at(iK0s2)][K0s_pT_bin_vector_US.at(iK0s1)]->Fill(TMath::Cos(theta_star));
-              K0s_K0s_cosThetaProdPlane_US_LS_eta_cuts_hist[K0s_eta_bin_vector_LS.at(iK0s2)][K0s_eta_bin_vector_US.at(iK0s1)]->Fill(TMath::Cos(theta_star));          
-            }  
-          
-          }
-          
-          nFilK0s_K0s_K0s_US_LS++;
-          
-        }
-        
-      }    
-    
-    }
-    
-    //_____________________________________________________________________________________________________________________________________________________________________
-    
-    //select K0s for mixed event with pi pairs
-    if( K0s_vector_US.size() == 1 && pi_star_vector_US_ME.size() < 1e4)
-    {
-      pi_star_vector_US_ME.push_back(pi_star_vector_US.at(0));
-      K0s_cuts_flag_US_ME.push_back(K0s_cuts_flag_US.at(0));
-
-      K0s_pT_bin_vector_US_ME.push_back(K0s_pT_bin_vector_US.at(0));
-      K0s_eta_bin_vector_US_ME.push_back(K0s_eta_bin_vector_US.at(0));     
-    }
-
-    //_________________________________________________________________________________________________________
-    
-    if( K0s_vector_LS.size() == 1 && pi_star_vector_LS_ME.size() < 1e4)
-    {
-      pi_star_vector_LS_ME.push_back(pi_star_vector_LS.at(0));
-      K0s_cuts_flag_LS_ME.push_back(K0s_cuts_flag_LS.at(0));
-
-      K0s_pT_bin_vector_LS_ME.push_back(K0s_pT_bin_vector_LS.at(0));
-      K0s_eta_bin_vector_LS_ME.push_back(K0s_eta_bin_vector_LS.at(0));
-    }
-    
 
   }//end event loop
   
-  //__________________________________________________________________________________________________________________________________________________________________________________
-  
-  
-  //true MC mixed event
-  
-  //before cuts
-  for(unsigned int iK0s1 = 0; iK0s1 < pi_star_vector_ME.size(); iK0s1++)
-  {
-    for(unsigned int iK0s2 = iK0s1+1; iK0s2 < pi_star_vector_ME.size(); iK0s2++)
-    {
-      double theta_star = pi_star_vector_ME.at(iK0s1).Angle(pi_star_vector_ME.at(iK0s2).Vect());
-      
-      K0s_K0s_cosThetaProdPlane_ME->Fill(TMath::Cos(theta_star));
-      K0s_K0s_cosThetaProdPlane_ME_pT_hist[K0s_pT_bin_vector_ME.at(iK0s1)][K0s_pT_bin_vector_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-      K0s_K0s_cosThetaProdPlane_ME_eta_hist[K0s_eta_bin_vector_ME.at(iK0s1)][K0s_eta_bin_vector_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-    }   
-  
-  }
-  
-  //-----------------------------------------------------------------------------------------------------------------
-  
-  //after cuts
-  for(unsigned int iK0s1 = 0; iK0s1 < pi_star_cuts_vector_ME.size(); iK0s1++)
-  {
-    for(unsigned int iK0s2 = iK0s1+1; iK0s2 < pi_star_cuts_vector_ME.size(); iK0s2++)
-    {
-      double theta_star = pi_star_cuts_vector_ME.at(iK0s1).Angle(pi_star_cuts_vector_ME.at(iK0s2).Vect());
-      
-      K0s_K0s_cosThetaProdPlane_ME_cuts->Fill(TMath::Cos(theta_star));
-      K0s_K0s_cosThetaProdPlane_ME_pT_cuts_hist[K0s_pT_bin_cuts_vector_ME.at(iK0s1)][K0s_pT_bin_cuts_vector_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-      K0s_K0s_cosThetaProdPlane_ME_eta_cuts_hist[K0s_eta_bin_cuts_vector_ME.at(iK0s1)][K0s_eta_bin_cuts_vector_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-    }   
-  
-  }
-  
-  //_________________________________________________________________________________
-  
-  //mixed event with pi pairs
-  
-  //before cuts
-  //US matched to US
-  //K0s-K0s
-  for(unsigned int iK0s1 = 0; iK0s1 < pi_star_vector_US_ME.size(); iK0s1++)
-  {
-    for(unsigned int iK0s2 = iK0s1+1; iK0s2 < pi_star_vector_US_ME.size(); iK0s2++)
-    {
-      double theta_star = pi_star_vector_US_ME.at(iK0s1).Angle(pi_star_vector_US_ME.at(iK0s2).Vect());
-      
-      K0s_K0s_cosThetaProdPlane_US_ME->Fill(TMath::Cos(theta_star));
-      K0s_K0s_cosThetaProdPlane_US_ME_pT_hist[K0s_pT_bin_vector_US_ME.at(iK0s1)][K0s_pT_bin_vector_US_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-      K0s_K0s_cosThetaProdPlane_US_ME_eta_hist[K0s_eta_bin_vector_US_ME.at(iK0s1)][K0s_eta_bin_vector_US_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-      
-      if( K0s_cuts_flag_US_ME.at(iK0s1) == 1 && K0s_cuts_flag_US_ME.at(iK0s2) == 1) //both K0s in pair passed cuts
-      {
-        K0s_K0s_cosThetaProdPlane_US_ME_cuts->Fill(TMath::Cos(theta_star));
-        K0s_K0s_cosThetaProdPlane_US_ME_pT_cuts_hist[K0s_pT_bin_vector_US_ME.at(iK0s1)][K0s_pT_bin_vector_US_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-        K0s_K0s_cosThetaProdPlane_US_ME_eta_cuts_hist[K0s_eta_bin_vector_US_ME.at(iK0s1)][K0s_eta_bin_vector_LS_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));          
-      }
-      
-    }   
-  
-  }
-  
-  //US matched to LS
-  
-  int nFillK0s_K0s_K0s_ME;
-  
-  for( unsigned int iK0s1 = 0; iK0s1 < pi_star_vector_US_ME.size(); iK0s1++ )
-  {
-    for( unsigned int iK0s2 = 0; iK0s2 < pi_star_vector_LS_ME.size(); iK0s2++ )
-    {
-      
-      if( nFillK0s_K0s_K0s_ME % 2 == 0 )
-      {
-        float theta_star = pi_star_vector_US_ME.at(iK0s1).Angle(pi_star_vector_LS_ME.at(iK0s2).Vect());
-      
-        K0s_K0s_cosThetaProdPlane_US_LS_ME->Fill(TMath::Cos(theta_star));
-        K0s_K0s_cosThetaProdPlane_US_LS_ME_pT_hist[K0s_pT_bin_vector_US_ME.at(iK0s1)][K0s_pT_bin_vector_LS_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-        K0s_K0s_cosThetaProdPlane_US_LS_ME_eta_hist[K0s_eta_bin_vector_US_ME.at(iK0s1)][K0s_eta_bin_vector_LS_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-        
-        if( K0s_cuts_flag_US_ME.at(iK0s1) == 1 && K0s_cuts_flag_LS_ME.at(iK0s2) == 1) //both K0s in pair passed cuts
-        {
-          K0s_K0s_cosThetaProdPlane_US_LS_ME_cuts->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_US_LS_ME_pT_cuts_hist[K0s_pT_bin_vector_US_ME.at(iK0s1)][K0s_pT_bin_vector_LS_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_US_LS_ME_eta_cuts_hist[K0s_eta_bin_vector_US_ME.at(iK0s1)][K0s_eta_bin_vector_LS_ME.at(iK0s2)]->Fill(TMath::Cos(theta_star));          
-        }
-      
-      }
-      else
-      {
-        float theta_star = pi_star_vector_LS_ME.at(iK0s2).Angle(pi_star_vector_US_ME.at(iK0s1).Vect());
-      
-        K0s_K0s_cosThetaProdPlane_US_LS_ME->Fill(TMath::Cos(theta_star));
-        K0s_K0s_cosThetaProdPlane_US_LS_ME_pT_hist[K0s_pT_bin_vector_LS_ME.at(iK0s2)][K0s_pT_bin_vector_US_ME.at(iK0s1)]->Fill(TMath::Cos(theta_star));
-        K0s_K0s_cosThetaProdPlane_US_LS_ME_eta_hist[K0s_eta_bin_vector_LS_ME.at(iK0s2)][K0s_eta_bin_vector_US_ME.at(iK0s1)]->Fill(TMath::Cos(theta_star));
-        
-        if( K0s_cuts_flag_US_ME.at(iK0s1) == 1 && K0s_cuts_flag_LS_ME.at(iK0s2) == 1) //both K0s in pair passed cuts
-        {
-          K0s_K0s_cosThetaProdPlane_US_LS_ME_cuts->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_US_LS_ME_pT_cuts_hist[K0s_pT_bin_vector_LS_ME.at(iK0s2)][K0s_pT_bin_vector_US_ME.at(iK0s1)]->Fill(TMath::Cos(theta_star));
-          K0s_K0s_cosThetaProdPlane_US_LS_ME_eta_cuts_hist[K0s_eta_bin_vector_LS_ME.at(iK0s2)][K0s_eta_bin_vector_US_ME.at(iK0s1)]->Fill(TMath::Cos(theta_star));          
-        }  
-      
-      }
-      
-      nFillK0s_K0s_K0s_ME++;
-      
-    }
-    
-  }
-  
-  //_____________________________________________________________________________________________________________________________________________________________________
-  
- 
   
   outFile->cd();
   outFile->Write();
