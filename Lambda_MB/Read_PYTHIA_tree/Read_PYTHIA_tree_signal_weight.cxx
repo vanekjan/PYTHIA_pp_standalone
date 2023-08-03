@@ -145,7 +145,7 @@ struct L_from_pairs {
 };
 
 
-void Read_PYTHIA_tree( int mEnergy = 200 )
+void Read_PYTHIA_tree_signal_weight( int mEnergy = 200 , float weight_slope = 0.05)
 {
   cout<<"Start"<<endl;
 
@@ -257,7 +257,7 @@ void Read_PYTHIA_tree( int mEnergy = 200 )
   
 
   // Create file on which histogram(s) can be saved.
-  TFile* outFile = new TFile("/gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/output/pp_200/new_out_hist/output_Lambda_pp_200_MB_1B_events_hists_work.root", "RECREATE");
+  TFile* outFile = new TFile("/gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/output/pp_200/new_out_hist/output_Lambda_pp_200_MB_1B_events_hists_signal_weight_work.root", "RECREATE");
 
   // Book histogram.
   //TH1F *mult = new TH1F("mult","charged multiplicity", 100, -0.5, 799.5);
@@ -1243,7 +1243,14 @@ void Read_PYTHIA_tree( int mEnergy = 200 )
   vector<int> Lbar_eta_bin_vector_LS_ME_cuts;
   
   //_____________________________________________________________________________________________________________________________________________________________________
-
+  
+  //weight function used to introduce signal in dN/dcos(theta*) distribotutions
+  //for closure test - if we can 
+  TF1 *weight_func = new TF1("weight_func", "[0]*x+1", -1, 1);
+  weight_func->SetParameter(0, weight_slope); //slope parameter set as an argument of macro
+  
+  
+  //_____________________________________________________________________________________________________________________________________________________________________
   
   Long64_t nEntries_MC = L_MC_chain->GetEntries();
   
@@ -1449,10 +1456,12 @@ void Read_PYTHIA_tree( int mEnergy = 200 )
         for(unsigned int iLambdaBar = 0; iLambdaBar < pBar_star_vector.size(); iLambdaBar++)
         {
           double theta_star = p_star_vector.at(iLambda).Angle(pBar_star_vector.at(iLambdaBar));
+          
+          float signal_weight = weight_func->Eval(TMath::Cos(theta_star));
          
-          L0_L0bar_cosThetaProdPlane->Fill(TMath::Cos(theta_star));          
-          L0_L0bar_cosThetaProdPlane_pT_hist[L_pT_bin_vector.at(iLambda)][Lbar_pT_bin_vector.at(iLambdaBar)]->Fill(TMath::Cos(theta_star));
-          L0_L0bar_cosThetaProdPlane_eta_hist[L_eta_bin_vector.at(iLambda)][Lbar_eta_bin_vector.at(iLambdaBar)]->Fill(TMath::Cos(theta_star));
+          L0_L0bar_cosThetaProdPlane->Fill(TMath::Cos(theta_star), signal_weight);          
+          L0_L0bar_cosThetaProdPlane_pT_hist[L_pT_bin_vector.at(iLambda)][Lbar_pT_bin_vector.at(iLambdaBar)]->Fill(TMath::Cos(theta_star), signal_weight);
+          L0_L0bar_cosThetaProdPlane_eta_hist[L_eta_bin_vector.at(iLambda)][Lbar_eta_bin_vector.at(iLambdaBar)]->Fill(TMath::Cos(theta_star), signal_weight);
           
           L0_L0bar_eta1_vs_eta2_hist->Fill(L_vector.at(iLambda).Eta() , Lbar_vector.at(iLambdaBar).Eta());
           L0_L0bar_phi1_vs_phi2_hist->Fill(L_vector.at(iLambda).Phi() , Lbar_vector.at(iLambdaBar).Phi());
@@ -1482,9 +1491,11 @@ void Read_PYTHIA_tree( int mEnergy = 200 )
         {
           double theta_star = p_star_vector.at(iLambda1).Angle(p_star_vector.at(iLambda2));
           
-          L0_L0_cosThetaProdPlane->Fill(TMath::Cos(theta_star));
-          L0_L0_cosThetaProdPlane_pT_hist[L_pT_bin_vector.at(iLambda1)][L_pT_bin_vector.at(iLambda2)]->Fill(TMath::Cos(theta_star));
-          L0_L0_cosThetaProdPlane_eta_hist[L_eta_bin_vector.at(iLambda1)][L_eta_bin_vector.at(iLambda2)]->Fill(TMath::Cos(theta_star));
+          float signal_weight = weight_func->Eval(TMath::Cos(theta_star));
+          
+          L0_L0_cosThetaProdPlane->Fill(TMath::Cos(theta_star), signal_weight);
+          L0_L0_cosThetaProdPlane_pT_hist[L_pT_bin_vector.at(iLambda1)][L_pT_bin_vector.at(iLambda2)]->Fill(TMath::Cos(theta_star), signal_weight);
+          L0_L0_cosThetaProdPlane_eta_hist[L_eta_bin_vector.at(iLambda1)][L_eta_bin_vector.at(iLambda2)]->Fill(TMath::Cos(theta_star), signal_weight);
           
           
           //delta eta vs. delta phi for ME re-weighing
@@ -1511,9 +1522,11 @@ void Read_PYTHIA_tree( int mEnergy = 200 )
         {
           double theta_star = pBar_star_vector.at(iLambdaBar1).Angle(pBar_star_vector.at(iLambdaBar2));
           
-          L0bar_L0bar_cosThetaProdPlane->Fill(TMath::Cos(theta_star));
-          L0bar_L0bar_cosThetaProdPlane_pT_hist[Lbar_pT_bin_vector.at(iLambdaBar1)][Lbar_pT_bin_vector.at(iLambdaBar2)]->Fill(TMath::Cos(theta_star));
-          L0bar_L0bar_cosThetaProdPlane_eta_hist[Lbar_eta_bin_vector.at(iLambdaBar1)][Lbar_eta_bin_vector.at(iLambdaBar2)]->Fill(TMath::Cos(theta_star));
+          float signal_weight = weight_func->Eval(TMath::Cos(theta_star));
+          
+          L0bar_L0bar_cosThetaProdPlane->Fill(TMath::Cos(theta_star), signal_weight);
+          L0bar_L0bar_cosThetaProdPlane_pT_hist[Lbar_pT_bin_vector.at(iLambdaBar1)][Lbar_pT_bin_vector.at(iLambdaBar2)]->Fill(TMath::Cos(theta_star), signal_weight);
+          L0bar_L0bar_cosThetaProdPlane_eta_hist[Lbar_eta_bin_vector.at(iLambdaBar1)][Lbar_eta_bin_vector.at(iLambdaBar2)]->Fill(TMath::Cos(theta_star), signal_weight);
           
           
           //delta eta vs. delta phi for ME re-weighing
@@ -1572,9 +1585,11 @@ void Read_PYTHIA_tree( int mEnergy = 200 )
         
           double theta_star = p_star_cuts_vector.at(iLambda).Angle(pBar_star_cuts_vector.at(iLambdaBar));
           
-          L0_L0bar_cosThetaProdPlane_cuts->Fill(TMath::Cos(theta_star));
-          L0_L0bar_cosThetaProdPlane_pT_cuts_hist[L_pT_bin_cuts_vector.at(iLambda)][Lbar_pT_bin_cuts_vector.at(iLambdaBar)]->Fill(TMath::Cos(theta_star));
-          L0_L0bar_cosThetaProdPlane_eta_cuts_hist[L_eta_bin_cuts_vector.at(iLambda)][Lbar_eta_bin_cuts_vector.at(iLambdaBar)]->Fill(TMath::Cos(theta_star));  
+          float signal_weight = weight_func->Eval(TMath::Cos(theta_star));
+          
+          L0_L0bar_cosThetaProdPlane_cuts->Fill(TMath::Cos(theta_star), signal_weight);
+          L0_L0bar_cosThetaProdPlane_pT_cuts_hist[L_pT_bin_cuts_vector.at(iLambda)][Lbar_pT_bin_cuts_vector.at(iLambdaBar)]->Fill(TMath::Cos(theta_star), signal_weight);
+          L0_L0bar_cosThetaProdPlane_eta_cuts_hist[L_eta_bin_cuts_vector.at(iLambda)][Lbar_eta_bin_cuts_vector.at(iLambdaBar)]->Fill(TMath::Cos(theta_star), signal_weight);  
           
           
           L0_L0bar_eta1_vs_eta2_cuts_hist->Fill(L_cuts_vector.at(iLambda).Eta() , Lbar_cuts_vector.at(iLambdaBar).Eta());
@@ -1616,9 +1631,11 @@ void Read_PYTHIA_tree( int mEnergy = 200 )
         {
           double theta_star = p_star_cuts_vector.at(iLambda1).Angle(p_star_cuts_vector.at(iLambda2));
           
-          L0_L0_cosThetaProdPlane_cuts->Fill(TMath::Cos(theta_star));
-          L0_L0_cosThetaProdPlane_pT_cuts_hist[L_pT_bin_cuts_vector.at(iLambda1)][L_pT_bin_cuts_vector.at(iLambda2)]->Fill(TMath::Cos(theta_star));
-          L0_L0_cosThetaProdPlane_eta_cuts_hist[L_eta_bin_cuts_vector.at(iLambda1)][L_eta_bin_cuts_vector.at(iLambda2)]->Fill(TMath::Cos(theta_star));           
+          float signal_weight = weight_func->Eval(TMath::Cos(theta_star));
+          
+          L0_L0_cosThetaProdPlane_cuts->Fill(TMath::Cos(theta_star), signal_weight);
+          L0_L0_cosThetaProdPlane_pT_cuts_hist[L_pT_bin_cuts_vector.at(iLambda1)][L_pT_bin_cuts_vector.at(iLambda2)]->Fill(TMath::Cos(theta_star), signal_weight);
+          L0_L0_cosThetaProdPlane_eta_cuts_hist[L_eta_bin_cuts_vector.at(iLambda1)][L_eta_bin_cuts_vector.at(iLambda2)]->Fill(TMath::Cos(theta_star), signal_weight);           
           
           
           //delta eta vs. delta phi for ME re-weighing          
@@ -1646,9 +1663,11 @@ void Read_PYTHIA_tree( int mEnergy = 200 )
         {
           double theta_star = pBar_star_cuts_vector.at(iLambdaBar1).Angle(pBar_star_cuts_vector.at(iLambdaBar2));
           
-          L0bar_L0bar_cosThetaProdPlane_cuts->Fill(TMath::Cos(theta_star));
-          L0bar_L0bar_cosThetaProdPlane_pT_cuts_hist[Lbar_pT_bin_cuts_vector.at(iLambdaBar1)][Lbar_pT_bin_cuts_vector.at(iLambdaBar2)]->Fill(TMath::Cos(theta_star));
-          L0bar_L0bar_cosThetaProdPlane_eta_cuts_hist[Lbar_eta_bin_cuts_vector.at(iLambdaBar1)][Lbar_eta_bin_cuts_vector.at(iLambdaBar2)]->Fill(TMath::Cos(theta_star));
+          float signal_weight = weight_func->Eval(TMath::Cos(theta_star));
+          
+          L0bar_L0bar_cosThetaProdPlane_cuts->Fill(TMath::Cos(theta_star), signal_weight);
+          L0bar_L0bar_cosThetaProdPlane_pT_cuts_hist[Lbar_pT_bin_cuts_vector.at(iLambdaBar1)][Lbar_pT_bin_cuts_vector.at(iLambdaBar2)]->Fill(TMath::Cos(theta_star), signal_weight);
+          L0bar_L0bar_cosThetaProdPlane_eta_cuts_hist[Lbar_eta_bin_cuts_vector.at(iLambdaBar1)][Lbar_eta_bin_cuts_vector.at(iLambdaBar2)]->Fill(TMath::Cos(theta_star), signal_weight);
           
           //delta eta vs. delta phi for ME re-weighing          
           //float delta_eta = fabs( Lbar_cuts_vector.at(iLambdaBar1).Eta() - Lbar_cuts_vector.at(iLambdaBar2).Eta() );
