@@ -26,9 +26,9 @@
 //#include "TChain.h"
 #include "TLorentzVector.h"
 #include "TF1.h"
-//#include "TRandom3.h"
-//#include "TString.h"
-//#include "TMath.h"
+#include "TRandom3.h"
+#include "TString.h"
+#include "TMath.h"
 
 
 // ROOT, for saving file.
@@ -182,6 +182,7 @@ int main( int argc, char *argv[])
     return 0;
   }
   
+  
   mySeed += 1; //need to sart at 1, argument starts at 0
   
   // Create Pythia instance and set it up to generate hard QCD processes
@@ -316,7 +317,7 @@ int main( int argc, char *argv[])
   //L charge
   L_tree->Branch( "L_charge", &Lambda_from_pair.L_charge , "L_charge[nL]/I" ); //1 - L, -1 - Lbar
   L_tree->Branch( "L_US_LS_flag", &Lambda_from_pair.L_US_LS_flag , "L_US_LS_flag[nL]/I" ); // 1 - US, 0 - LS
-   
+
 
   // Begin event loop. Generate event; skip if generation aborted.
   //for (int iEvent = 0; iEvent < 2e8; ++iEvent)
@@ -339,7 +340,7 @@ int main( int argc, char *argv[])
 
         TLorentzVector p_fourmom;
         p_fourmom.SetPxPyPzE(pythia.event[i].px(), pythia.event[i].py(), pythia.event[i].pz(), pythia.event[i].e());
-        
+                
         TVector3 p_origin = TVector3(pythia.event[i].xProd(), pythia.event[i].yProd(), pythia.event[i].zProd()); //proton production vertex
         
         if( pythia.event[i].id() > 0 ) 
@@ -350,6 +351,7 @@ int main( int argc, char *argv[])
         
         if( pythia.event[i].id() < 0 )
         {
+       
           pBar_vector_event.push_back(p_fourmom);   
           pBar_origin_vector_event.push_back(p_origin);        
         }
@@ -357,7 +359,7 @@ int main( int argc, char *argv[])
       }
       
       if( fabs(pythia.event[i].id()) == 211)
-      {
+      {        
 
         TLorentzVector pi_fourmom;
         pi_fourmom.SetPxPyPzE(pythia.event[i].px(), pythia.event[i].py(), pythia.event[i].pz(), pythia.event[i].e());
@@ -366,12 +368,14 @@ int main( int argc, char *argv[])
         
         if( pythia.event[i].id() > 0 ) 
         {
+         
           pi_vector_event.push_back(pi_fourmom);
           pi_origin_vector_event.push_back(pi_origin);
         }
         
         if( pythia.event[i].id() < 0 )
         {
+       
           piBar_vector_event.push_back(pi_fourmom);
           piBar_origin_vector_event.push_back(pi_origin);
         }
@@ -391,10 +395,15 @@ int main( int argc, char *argv[])
         const int daughter1_Id = pythia.event[i].daughter1();
         const int daughter2_Id = pythia.event[i].daughter2();
         
+        //daughter kinematics
+        p_fourmom.SetPxPyPzE(pythia.event[daughter1_Id].px(), pythia.event[daughter1_Id].py(), pythia.event[daughter1_Id].pz(), pythia.event[daughter1_Id].e());        
         
+        pi_fourmom.SetPxPyPzE(pythia.event[daughter2_Id].px(), pythia.event[daughter2_Id].py(), pythia.event[daughter2_Id].pz(), pythia.event[daughter2_Id].e());       
+
         //Lambda fourmomentum
         L_fourmom.SetPxPyPzE(pythia.event[i].px(), pythia.event[i].py(), pythia.event[i].pz(), pythia.event[i].e());
         
+                       
         if(L_fourmom.Rapidity() >= 1) continue; //want only L within |y| < 1
         
         //save L momentum
@@ -402,14 +411,9 @@ int main( int argc, char *argv[])
         Lambda_MC.L_py_MC[iLambda] = L_fourmom.Py();
         Lambda_MC.L_pz_MC[iLambda] = L_fourmom.Pz();        
                
-        //daughter kinematics
-        p_fourmom.SetPxPyPzE(pythia.event[daughter1_Id].px(), pythia.event[daughter1_Id].py(), pythia.event[daughter1_Id].pz(), pythia.event[daughter1_Id].e());
-        
         Lambda_MC.p_pT_MC[iLambda] = p_fourmom.Pt();
         Lambda_MC.p_eta_MC[iLambda] = p_fourmom.Eta();
         Lambda_MC.p_phi_MC[iLambda] = p_fourmom.Phi();
-        
-        pi_fourmom.SetPxPyPzE(pythia.event[daughter2_Id].px(), pythia.event[daughter2_Id].py(), pythia.event[daughter2_Id].pz(), pythia.event[daughter2_Id].e());
         
         Lambda_MC.pi_pT_MC[iLambda] = pi_fourmom.Pt();
         Lambda_MC.pi_eta_MC[iLambda] = pi_fourmom.Eta();

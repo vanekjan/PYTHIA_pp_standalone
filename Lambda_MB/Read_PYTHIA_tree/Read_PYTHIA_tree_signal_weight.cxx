@@ -160,12 +160,14 @@ void Read_PYTHIA_tree_signal_weight( int mEnergy = 200 , float weight_slope = 0.
   else if(mEnergy == 200)
   {
     //MB without strict TOF matching
-    fileList.open("/gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/output/pp_200/tree_1B_events/fileList.list");
+    //fileList.open("/gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/output/pp_200/tree_1B_events/fileList.list");
+    fileList.open("/gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/output/pp_200/tree_1B_events_mom_smear/fileList.list");
     
   }
   else if (mEnergy == 0) //testing file
   {
-    fileList.open("/gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/output/pp_200/tree_1B_events/testList.list"); //one root file for quick tests
+    //fileList.open("/gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/output/pp_200/tree_1B_events/testList.list"); //one root file for quick tests
+    fileList.open("/gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/output/pp_200/tree_1B_events_mom_smear/testList.list"); //one root file for quick tests
   }
   else
   {

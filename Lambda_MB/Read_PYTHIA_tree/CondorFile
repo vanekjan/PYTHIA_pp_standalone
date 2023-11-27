@@ -5,6 +5,6 @@ getenv = true
 
 Output       = /gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/Read_PYTHIA_tree/jobs/log/Read_PYTHIA_tree.out
 Error        = /gpfs/mnt/gpfs02/eic/janvanek/PYTHIA_pp/Lambda_MB/Read_PYTHIA_tree/jobs/log/Read_PYTHIA_tree.err
-Arguments    = 200
+Arguments    = 200 0
 
 Queue
